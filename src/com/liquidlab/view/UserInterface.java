@@ -1,7 +1,8 @@
 package com.liquidlab.view;
 
-import javax.swing.JFrame;
-import com.liquidlab.model.*;
+import com.liquidlab.model.DatabaseInteraction;
+
+import javax.swing.*;
 import java.awt.*;
 
 /**
@@ -12,11 +13,40 @@ import java.awt.*;
  * This class provides the View of the MVC relationship, providing and interactive user interface.
  */
 public class UserInterface extends JFrame {
+    //Database Variables
     private DatabaseInteraction dbInt;
 
+    /**
+     * Creates a user interface with a connection to the DatabaseInteraction class
+     *
+     * @param db Connection to DatabaseInteraction class, allowing for database querying
+     * @throws HeadlessException Thrown when database cannot be accessed or manipulated
+     */
     public UserInterface(DatabaseInteraction db) throws HeadlessException {
         super("LiquidLab");
-        this.dbInt = db;
+        this.setDB(dbInt);
+
+    }
+    //Getter methods for variables
+
+    /**
+     * Allows communication with the DatabaseInteraction class
+     *
+     * @return The database containing relevant data for this operation
+     */
+    public DatabaseInteraction getDB() {
+        return dbInt;
+    }
+
+    //Setter methods for variables
+
+    /**
+     * Sends information to the DatabaseInteraction
+     *
+     * @param db The database to send information to.
+     */
+    private void setDB(DatabaseInteraction db) {
+        dbInt = db;
     }
 
 }
