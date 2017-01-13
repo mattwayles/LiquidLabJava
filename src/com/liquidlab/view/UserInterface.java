@@ -1,5 +1,6 @@
 package com.liquidlab.view;
 
+import com.liquidlab.controller.BusinessLogic;
 import com.liquidlab.model.DatabaseInteraction;
 import javafx.application.Application;
 import javafx.geometry.HPos;
@@ -19,35 +20,70 @@ import javafx.stage.Stage;
  * This class provides the View of the MVC relationship, providing and interactive user interface.
  */
 public class UserInterface extends Application {
+    private static Text myProduct;
+    private BorderPane myPane;
     private DatabaseInteraction dbInt;
-    private GridPane input;
+    private GridPane myInput, myOutput;
+    private TextField myMlToMake, myNic, myPg, myVg;
+    private Double myPgMl, myVgMl, myNicMl, myFlavMl, myPgG, myVgG, myNicG;
+    private TextArea myNotes;
+    private Integer myPgPer, myVgPer, myNicPer;
+    private Integer myRows;
+    private FlavorView[] flavors;
+
+    public static Text getProduct() {
+        return myProduct;
+    }
+
+    private static void setProduct(Text newProd) {
+        myProduct = newProd;
+    }
 
     public static void main(String[] args) {
         launch(args);
     }
 
-    @Override
-    public void start(Stage primaryStage) {
-        //Set initial window title
-        primaryStage.setTitle("LiquidLab");
-        BorderPane pane = new BorderPane();
-        //Set Top Pane
-        this.setTopPane(pane);
-        //Set Left pane
-        this.setLeftPane(pane);
-        //Set Right Pane
-        this.setRightPane(pane);
-        //Initialize grid in a scene
-        Scene scene = new Scene(pane, 1000, 500);
-        //Set scene to initial window
-        primaryStage.setScene(scene);
-        //Link CSS stylesheet
-        scene.getStylesheets().add(UserInterface.class.getResource("Test.css").toExternalForm());
-        //Display window
-        primaryStage.show();
+    //Getters
+    public TextField getMlToMake() {
+        return myMlToMake;
     }
 
-    //Getter methods for variables
+    //Setters
+    private void setMlToMake(TextField txtFld) {
+        myMlToMake = txtFld;
+    }
+
+    public TextField getNic() {
+        return myNic;
+    }
+
+    private void setNic(TextField txtFld) {
+        myNic = txtFld;
+    }
+
+    public TextField getPg() {
+        return myPg;
+    }
+
+    private void setPg(TextField txtFld) {
+        myPg = txtFld;
+    }
+
+    public TextField getVg() {
+        return myVg;
+    }
+
+    private void setVg(TextField txtFld) {
+        myVg = txtFld;
+    }
+
+    public TextArea getNotes() {
+        return myNotes;
+    }
+
+    private void setNotes(TextArea txtArea) {
+        myNotes = txtArea;
+    }
 
     /**
      * Allows communication with the DatabaseInteraction class
@@ -68,12 +104,115 @@ public class UserInterface extends Application {
     }
 
     public GridPane getInput() {
-        return input;
+        return myInput;
     }
 
-    //Setter methods for variables
     public void setInput(GridPane inputPane) {
-        input = inputPane;
+        myInput = inputPane;
+    }
+
+    public GridPane getOutput() {
+        return myOutput;
+    }
+
+    public void setOutput(GridPane outputPane) {
+        myOutput = outputPane;
+    }
+
+    public Double getPgMl() {
+        return myPgMl;
+    }
+
+    public void setPgMl(Double txt) {
+        myPgMl = txt;
+    }
+
+    public Double getVgMl() {
+        return myVgMl;
+    }
+
+    public void setVgMl(Double txt) {
+        myVgMl = txt;
+    }
+
+    public Double getNicMl() {
+        return myNicMl;
+    }
+
+    public void setNicMl(Double txt) {
+        myNicMl = txt;
+    }
+
+    public Double getPgG() {
+        return myPgG;
+    }
+
+    public void setPgG(Double txt) {
+        myPgG = txt;
+    }
+
+    public Double getVgG() {
+        return myVgG;
+    }
+
+    public void setVgG(Double txt) {
+        myVgG = txt;
+    }
+
+    public Double getNicG() {
+        return myNicG;
+    }
+
+    public void setNicG(Double txt) {
+        myNicG = txt;
+    }
+
+    public Integer getPgPer() {
+        return myPgPer;
+    }
+
+    public void setPgPer(Integer txt) {
+        myPgPer = txt;
+    }
+
+    public Integer getVgPer() {
+        return myVgPer;
+    }
+
+    public void setVgPer(Integer txt) {
+        myVgPer = txt;
+    }
+
+    public Integer getNicPer() {
+        return myNicPer;
+    }
+
+    public void setNicPer(Integer txt) {
+        myNicPer = txt;
+    }
+
+    public FlavorView[] getFlavors() {
+        return flavors;
+    }
+
+    public void setFlavors(FlavorView[] flavs) {
+        flavors = flavs;
+    }
+
+    private BorderPane getPane() {
+        return myPane;
+    }
+
+    private void setPane(BorderPane newPane) {
+        myPane = newPane;
+    }
+
+    private int getRowCount() {
+        return myRows;
+    }
+
+    private void setRowCount(int count) {
+        myRows = count;
     }
 
     private void setTopPane(BorderPane parent) {
@@ -129,85 +268,49 @@ public class UserInterface extends Application {
         parent.setLeft(lAnchor);
 
         //Left Pane complete, set controls
-        this.setLeftControls(this.getInput());
+        this.setLeftControls();
 
         calcBtn.setOnMouseClicked((event) -> {
             this.calcButtonAction();
         });
-    }
-
-    private void calcButtonAction() {
 
     }
 
-    private void setLeftControls(GridPane thisPane) {
+    private void setLeftControls() {
         //Declarations
         ComboBox<String> flList;
-        Label mlToMakeText;
-        TextField mlToMakeField;
-        Label mlToMakeUnit;
-        Label nicText;
-        TextField nicField;
-        Label nicUnit;
-        Label pgText;
-        pgText = new Label("Target PG:");
-        TextField pgField;
-        Label pgUnit;
-        Label vgText;
-        TextField vgField;
-        Label vgUnit;
-        TextArea notes;
-        Text newFlav;
-        TextField ven;
-        TextField ven2;
-        TextField ven3;
-        TextField flav;
-        TextField flavPer;
-        Label flavUnit;
-        TextField flav2;
-        TextField flavPer2;
-        Label flavUnit2;
-        TextField flav3;
-        TextField flavPer3;
-        Label flavUnit3;
+        final Label mlToMakeText;
+        final Label mlToMakeUnit;
+        final Label nicText;
+        final Label nicUnit;
+        final Label pgText;
+        final Label pgUnit;
+        final Label vgText;
+        final Label vgUnit;
+        final Text newFlav;
         Button addFlav;
+
 
         //Initializations
         flList = new ComboBox<String>();
         mlToMakeText = new Label("ML To Make:");
-        mlToMakeField = new TextField();
         mlToMakeUnit = new Label("ml");
         nicText = new Label("Target Nicotine:");
-        nicField = new TextField();
         nicUnit = new Label("mg");
-        pgField = new TextField();
+        pgText = new Label("Target PG:");
         pgUnit = new Label("%");
         vgText = new Label("Target VG:");
-        vgField = new TextField();
         vgUnit = new Label("%");
-        notes = new TextArea();
         newFlav = new Text("New Recipe");
-        ven = new TextField();
-        ven2 = new TextField();
-        ven3 = new TextField();
-        flav = new TextField();
-        flavPer = new TextField();
-        flavUnit = new Label("%");
-        flav2 = new TextField();
-        flavPer2 = new TextField();
-        flavUnit2 = new Label("%");
-        flav3 = new TextField();
-        flavPer3 = new TextField();
-        flavUnit3 = new Label("%");
         addFlav = new Button("+");
+        this.setMlToMake(new TextField());
+        this.setNic(new TextField());
+        this.setPg(new TextField());
+        this.setVg(new TextField());
+        this.setNotes(new TextArea());
+
         //Set Prompt Text
-        notes.setPromptText("Notes:");
-        ven.setPromptText("Ven");
-        ven2.setPromptText("Ven");
-        ven3.setPromptText("Ven");
-        flav.setPromptText("Flavor 1");
-        flav2.setPromptText("Flavor 2");
-        flav3.setPromptText("Flavor 3");
+        this.getNotes().setPromptText("Notes:");
 
         //Format Drop-Down Menu
         flList.setPromptText("Select Flavor...");
@@ -215,157 +318,149 @@ public class UserInterface extends Application {
         flList.getItems().add("Whirlmelon");
         flList.getItems().add("The Simple Lifeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
         //Add to GridPane
-        thisPane.add(flList, 0, 0, 3, 1);
+        this.getInput().add(flList, 0, 0, 3, 1);
 
         //Ml to Make
-        thisPane.add(mlToMakeText, 0, 1);
-        thisPane.add(mlToMakeField, 1, 1);
-        thisPane.add(mlToMakeUnit, 2, 1);
+        this.formatTextField(this.getMlToMake(), 4);
+        this.getInput().add(mlToMakeText, 0, 1);
+        this.getInput().add(this.getMlToMake(), 1, 1);
+        this.getInput().add(mlToMakeUnit, 2, 1);
         //Nic
-        thisPane.add(nicText, 0, 2);
-        thisPane.add(nicField, 1, 2);
-        thisPane.add(nicUnit, 2, 2);
+        this.formatTextField(this.getNic(), 3);
+        this.getInput().add(nicText, 0, 2);
+        this.getInput().add(this.getNic(), 1, 2);
+        this.getInput().add(nicUnit, 2, 2);
         //PG
-        thisPane.add(pgText, 0, 3);
-        thisPane.add(pgField, 1, 3);
-        thisPane.add(pgUnit, 2, 3);
+        this.formatTextField(this.getPg(), 3);
+        this.getInput().add(pgText, 0, 3);
+        this.getInput().add(this.getPg(), 1, 3);
+        this.getInput().add(pgUnit, 2, 3);
         //VG
-        thisPane.add(vgText, 0, 4);
-        thisPane.add(vgField, 1, 4);
-        thisPane.add(vgUnit, 2, 4);
+        this.formatTextField(this.getVg(), 3);
+        this.getInput().add(vgText, 0, 4);
+        this.getInput().add(this.getVg(), 1, 4);
+        this.getInput().add(vgUnit, 2, 4);
 
         //Set control CSS IDs
         //notes.setId("text-area");
         newFlav.setId("grid-header");
-        ven.setId("text-field-vendor");
-        ven2.setId("text-field-vendor");
-        ven3.setId("text-field-vendor");
-        flav.setId("text-field-flavor");
-        flav2.setId("text-field-flavor");
-        flav3.setId("text-field-flavor");
+        //this.getVen1().setId("text-field-vendor");
+        //this.getVen2().setId("text-field-vendor");
+        //this.getVen3().setId("text-field-vendor");
+        //this.getFlav1().setId("text-field-flavor");
+        //this.getFlav2().setId("text-field-flavor");
+        //this.getFlav3().setId("text-field-flavor");
+        //this.getFlav4().setId("text-field-flavor");
         GridPane.setHalignment(newFlav, HPos.CENTER);
         GridPane.setValignment(newFlav, VPos.TOP);
-        thisPane.add(notes, 0, 5, 3, 10);   //notes
-        thisPane.add(newFlav, 6, 0);    //new flavor label
-        thisPane.add(ven, 5, 1);    //vendors
-        thisPane.add(ven2, 5, 2);
-        thisPane.add(ven3, 5, 3);
-        thisPane.add(flav, 6, 1);   //flavors
-        thisPane.add(flav2, 6, 2);
-        thisPane.add(flav3, 6, 3);
-        thisPane.add(flavPer, 7, 1);    //flavor percentages
-        thisPane.add(flavPer2, 7, 2);
-        thisPane.add(flavPer3, 7, 3);
-        thisPane.add(flavUnit, 8, 1);   //Percent labels
-        thisPane.add(flavUnit2, 8, 2);
-        thisPane.add(flavUnit3, 8, 3);
+        this.getInput().add(this.getNotes(), 0, 5, 3, 10);   //notes
+        this.getInput().add(newFlav, 6, 0);    //new flavor label
+        //this.formatTextField(this.getVen1(), 3);
+        //this.getInput().add(this.getVen1(), 5, 1);    //vendors
+        //this.formatTextField(this.getVen2(), 3);
+        //this.getInput().add(this.getVen2(), 5, 2);
+        //this.formatTextField(this.getVen3(), 3);
+        //this.getInput().add(this.getVen3(), 5, 3);
+        //this.getInput().add(this.getFlav1(), 6, 1);   //flavors
+        //this.getInput().add(this.getFlav2(), 6, 2);
+        //this.getInput().add(this.getFlav3(), 6, 3);
+        //this.formatTextField(this.getFlavPer(), 3);
+        //this.getInput().add(this.getFlavPer(), 7, 1);    //flavor percentages
+        //this.formatTextField(this.getFlavPer2(), 3);
+        //this.getInput().add(this.getFlavPer2(), 7, 2);
+        //this.formatTextField(this.getFlavPer3(), 3);
+        //this.getInput().add(this.getFlavPer3(), 7, 3);
+        //this.getInput().add(flavUnit, 8, 1);   //Percent labels
+        //this.getInput().add(flavUnit2, 8, 2);
+        //this.getInput().add(flavUnit3, 8, 3);
         //Add flavor button
-        thisPane.add(addFlav, 5, 4);
-    }
+        this.getInput().add(addFlav, 5, 4);
 
-    private void textFieldEntered(TextInputControl node) {
-        if (node.getText().equals(node.getPromptText())) {
-            node.clear();
-        }
-        System.out.println("Click!");
+        //Event Handler
+        addFlav.setOnMouseClicked((event) -> {
+            this.addFlavButtonAction(addFlav);
+        });
     }
 
     private void setRightPane(BorderPane parent) {
-        //PLACEHOLDER VALUES!
-        Text totalMl = new Text("30.35");
-        Text totalG = new Text("34.03");
-        Text totalPer = new Text("100.00%");
-
         //Declarations
-        HBox rBox;
-        Label totalLabel;
         AnchorPane rAnchor;
-        GridPane output;
         Insets margin;
-        ColumnConstraints col1;
+        ColumnConstraints col1, col2, col3, col4;
         //Initializations
-        rBox = new HBox(35);
-        totalLabel = new Label("Total");
         rAnchor = new AnchorPane();
-        output = new GridPane();
+        this.setOutput(new GridPane());
         margin = new Insets(20, 30, 30, 0);
         col1 = new ColumnConstraints(120);
+        col2 = new ColumnConstraints(30);
+        col3 = new ColumnConstraints(40);
+        col4 = new ColumnConstraints(60);
 
         //Set CSS Styling
-        totalMl.setId("output");
-        totalG.setId("output-grams");
-        totalPer.setId("output");
-        rBox.setId("right-box");
-        output.setId("right-grid");
+        this.getOutput().setId("right-grid");
         rAnchor.setId("right-anchor");
-        output.getColumnConstraints().addAll(col1);
+        this.getOutput().getColumnConstraints().addAll(col1, col2, col3, col4);
         //Create box to hold total values
-        rBox.getChildren().addAll(totalLabel, totalMl, totalG, totalPer);
         //Anchor components
-        rAnchor.getChildren().addAll(output, rBox);
-        AnchorPane.setBottomAnchor(rBox, 5.0);
-        AnchorPane.setLeftAnchor(rBox, 8.0);
+        rAnchor.getChildren().add(this.getOutput());
         BorderPane.setMargin(rAnchor, margin);
-        AnchorPane.setTopAnchor(output, 10.0);
-        AnchorPane.setLeftAnchor(output, 10.0);
+        AnchorPane.setTopAnchor(this.getOutput(), 10.0);
+        AnchorPane.setLeftAnchor(this.getOutput(), 10.0);
         //Apply to borderpane
         parent.setRight(rAnchor);
 
         //set controls
-        this.setRightControls(output);
+        this.setRightControls(this.getOutput());
     }
 
-    private void setRightControls(GridPane thisPane) {
+    public void setRightControls(GridPane thisPane) {
         //PLACEHOLDER VALUES FOR RESULTS
-        Text pgMl = new Text("12.81");
-        Text vgMl = new Text("29.84");
-        Text nicMl = new Text("12.54");
-        Text flavMl1 = new Text("3.28");
-        Text flavMl2 = new Text("4.92");
-        Text flavMl3 = new Text("8.71");
-        Text pgG = new Text("14.37");
-        Text vgG = new Text("38.99");
-        Text nicG = new Text("14.31");
-        Text flavG1 = new Text("12.16");
-        Text flavG2 = new Text("8.21");
-        Text flavG3 = new Text("1.11");
-        Text pgPer = new Text("15.17");
-        Text vgPer = new Text("20.00");
-        Text nicPer = new Text("37.12");
-        Text flavPercent = new Text("18.13");
-        Text flavPercent2 = new Text("19.32");
-        Text flavPercent3 = new Text("47.32");
+
 
         //Declarations
-        Text product;
-        Label mlLabel;
-        Label gLabel;
-        Label perLabel;
-        Label pgLabel;
-        Label vgLabel;
-        Label nicLabel;
-        Label flavLabel1;
-        Label flavLabel2;
-        Label flavLabel3;
+        final Label mlLabel;
+        final Label gLabel;
+        final Label perLabel;
+        final Label pgLabel;
+        final Label vgLabel;
+        final Label nicLabel;
+        Text pgMlText;
+        Text vgMlText;
+        Text nicMlText;
+        Text pgGText;
+        Text vgGText;
+        Text nicGText;
+        Text pgPercentText;
+        Text vgPercentText;
+        Text nicPercentText;
+
 
         //Initializations
-        product = new Text("Results");
+        setProduct(new Text("Results"));
         mlLabel = new Label("ml");
         gLabel = new Label("grams");
         perLabel = new Label("% of Total");
         pgLabel = new Label("PG");
         vgLabel = new Label("VG");
         nicLabel = new Label("Nicotine");
-        flavLabel1 = new Label("TFA Blueberry");
-        flavLabel2 = new Label("FA Strawberry (Ripe)");
-        flavLabel3 = new Label("RF Bread Pudding");
+        pgMlText = new Text(this.getPgMl().toString());
+        vgMlText = new Text(this.getVgMl().toString());
+        nicMlText = new Text(this.getNicMl().toString());
+        pgGText = new Text(this.getPgG().toString());
+        vgGText = new Text(this.getVgG().toString());
+        nicGText = new Text(this.getNicG().toString());
+        pgPercentText = new Text(this.getPgPer().toString() + "%");
+        vgPercentText = new Text(this.getVgPer().toString() + "%");
+        nicPercentText = new Text(this.getNicPer().toString() + "%");
+
+
 
         //CSS Styling
-        product.setId("grid-header");
+        getProduct().setId("grid-header");
 
         //Add controls
-        thisPane.add(product, 0, 0, 5, 1);
-        GridPane.setHalignment(product, HPos.CENTER);
+        thisPane.add(getProduct(), 0, 0, 5, 1);
+        GridPane.setHalignment(getProduct(), HPos.CENTER);
         thisPane.add(mlLabel, 1, 1);
         GridPane.setHalignment(mlLabel, HPos.CENTER);
         thisPane.add(gLabel, 2, 1);
@@ -378,71 +473,113 @@ public class UserInterface extends Application {
         GridPane.setHalignment(vgLabel, HPos.RIGHT);
         thisPane.add(nicLabel, 0, 4);
         GridPane.setHalignment(nicLabel, HPos.RIGHT);
-        thisPane.add(flavLabel1, 0, 5);
-        GridPane.setHalignment(flavLabel1, HPos.RIGHT);
-        thisPane.add(flavLabel2, 0, 6);
-        GridPane.setHalignment(flavLabel2, HPos.RIGHT);
-        thisPane.add(flavLabel3, 0, 7);
-        GridPane.setHalignment(flavLabel3, HPos.RIGHT);
 
 
         //Placeholders - CSS Styling
-        pgMl.setId("output");
-        vgMl.setId("output");
-        nicMl.setId("output");
-        flavMl1.setId("output");
-        flavMl2.setId("output");
-        flavMl3.setId("output");
-        pgG.setId("output-grams");
-        vgG.setId("output-grams");
-        nicG.setId("output-grams");
-        flavG1.setId("output-grams");
-        flavG2.setId("output-grams");
-        flavG3.setId("output-grams");
-        pgPer.setId("output");
-        vgPer.setId("output");
-        nicPer.setId("output");
-        flavPercent.setId("output");
-        flavPercent2.setId("output");
-        flavPercent3.setId("output");
+        pgMlText.setId("output");
+        vgMlText.setId("output");
+        nicMlText.setId("output");
+        pgGText.setId("output-grams");
+        vgGText.setId("output-grams");
+        nicGText.setId("output-grams");
+        pgPercentText.setId("output");
+        vgPercentText.setId("output");
+        nicPercentText.setId("output");
 
 
         //Add placeholders
-        thisPane.add(pgMl, 1, 2);
-        GridPane.setHalignment(pgMl, HPos.CENTER);
-        thisPane.add(vgMl, 1, 3);
-        GridPane.setHalignment(vgMl, HPos.CENTER);
-        thisPane.add(nicMl, 1, 4);
-        GridPane.setHalignment(nicMl, HPos.CENTER);
-        thisPane.add(flavMl1, 1, 5);
-        GridPane.setHalignment(flavMl1, HPos.CENTER);
-        thisPane.add(flavMl2, 1, 6);
-        GridPane.setHalignment(flavMl2, HPos.CENTER);
-        thisPane.add(flavMl3, 1, 7);
-        GridPane.setHalignment(flavMl3, HPos.CENTER);
-        thisPane.add(pgG, 2, 2);
-        GridPane.setHalignment(pgG, HPos.CENTER);
-        thisPane.add(vgG, 2, 3);
-        GridPane.setHalignment(vgG, HPos.CENTER);
-        thisPane.add(nicG, 2, 4);
-        GridPane.setHalignment(nicG, HPos.CENTER);
-        thisPane.add(flavG1, 2, 5);
-        GridPane.setHalignment(flavG1, HPos.CENTER);
-        thisPane.add(flavG2, 2, 6);
-        GridPane.setHalignment(flavG2, HPos.CENTER);
-        thisPane.add(flavG3, 2, 7);
-        GridPane.setHalignment(flavG3, HPos.CENTER);
-        thisPane.add(pgPer, 3, 2);
-        GridPane.setHalignment(pgPer, HPos.CENTER);
-        thisPane.add(vgPer, 3, 3);
-        GridPane.setHalignment(vgPer, HPos.CENTER);
-        thisPane.add(nicPer, 3, 4);
-        GridPane.setHalignment(nicPer, HPos.CENTER);
-        thisPane.add(flavPercent, 3, 5);
-        GridPane.setHalignment(flavPercent, HPos.CENTER);
-        thisPane.add(flavPercent2, 3, 6);
-        GridPane.setHalignment(flavPercent2, HPos.CENTER);
-        thisPane.add(flavPercent3, 3, 7);
-        GridPane.setHalignment(flavPercent3, HPos.CENTER);
+        thisPane.add(pgMlText, 1, 2);
+        GridPane.setHalignment(pgMlText, HPos.CENTER);
+        thisPane.add(vgMlText, 1, 3);
+        GridPane.setHalignment(vgMlText, HPos.CENTER);
+        thisPane.add(nicMlText, 1, 4);
+        GridPane.setHalignment(nicMlText, HPos.CENTER);
+        thisPane.add(pgGText, 2, 2);
+        GridPane.setHalignment(pgGText, HPos.CENTER);
+        thisPane.add(vgGText, 2, 3);
+        GridPane.setHalignment(vgGText, HPos.CENTER);
+        thisPane.add(nicGText, 2, 4);
+        GridPane.setHalignment(nicGText, HPos.CENTER);
+        thisPane.add(pgPercentText, 3, 2);
+        GridPane.setHalignment(pgPercentText, HPos.CENTER);
+        thisPane.add(vgPercentText, 3, 3);
+        GridPane.setHalignment(vgPercentText, HPos.CENTER);
+        thisPane.add(nicPercentText, 3, 4);
+        GridPane.setHalignment(nicPercentText, HPos.CENTER);
+    }
+
+    private void varInit() {
+        this.setPgMl(0.0);
+        this.setVgMl(0.0);
+        this.setNicMl(0.0);
+        this.setPgG(0.0);
+        this.setVgG(0.0);
+        this.setNicG(0.0);
+        this.setPgPer(0);
+        this.setVgPer(0);
+        this.setNicPer(0);
+        this.setRowCount(4);
+    }
+
+    private void flavorInit() {
+        this.setFlavors(new FlavorView[11]);
+        for (int i = 0; i < 3; i++) {
+            this.getFlavors()[i] = new FlavorView(this);
+        }
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+
+        //Set initial window title
+        primaryStage.setTitle("LiquidLab");
+        this.setPane(new BorderPane());
+        this.varInit();
+        //Set Top Pane
+        this.setTopPane(this.getPane());
+        //Set Left pane
+        this.setLeftPane(this.getPane());
+        //Set Right Pane
+        this.setRightPane(this.getPane());
+        //Set flavors
+        this.flavorInit();
+        //Initialize grid in a scene
+        Scene scene = new Scene(this.getPane(), 1000, 500);
+        //Set scene to initial window
+        primaryStage.setScene(scene);
+        //Link CSS stylesheet
+        scene.getStylesheets().add(UserInterface.class.getResource("Test.css").toExternalForm());
+        //Display window
+        primaryStage.show();
+    }
+
+    public void formatTextField(TextField field, int maxLen) {
+        field.setTextFormatter(new TextFormatter<String>((TextFormatter.Change change) -> {
+            String newText = change.getControlNewText();
+            if (newText.length() > maxLen) {
+                return null;
+            } else {
+                return change;
+            }
+        }));
+    }
+
+    public void update() {
+        this.setRightPane(this.getPane());
+    }
+
+    private void calcButtonAction() {
+        BusinessLogic bl = new BusinessLogic(this, getDB());
+        bl.calculate();
+    }
+
+    private void addFlavButtonAction(Button btn) {
+        this.getInput().getChildren().remove(btn);
+        this.getFlavors()[this.getRowCount()] = new FlavorView(this);
+        if ((this.getRowCount()) < 10) {
+            this.getInput().add(btn, 5, this.getRowCount() + 1);
+            this.setRowCount(this.getRowCount() + 1);
+        }
+
     }
 }

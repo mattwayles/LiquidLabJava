@@ -73,7 +73,6 @@
     -fx-vgap: 10;
     }
 #right-grid {
-
     -fx-hgap: 35;
     -fx-vgap: 10;
     }
@@ -98,11 +97,6 @@
     -fx-background-color: gray;
     -fx-padding: 10px;
     }
-/* Used to pad the boxes */
-#right-box {
-    -fx-padding: 0px 0px 0px 100px;
-    }
-
 /* Used to format output text */
 #output {
     -fx-font-size: 11px;

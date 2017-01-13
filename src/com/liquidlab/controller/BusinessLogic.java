@@ -4,6 +4,7 @@ import com.liquidlab.Flavor;
 import com.liquidlab.model.DatabaseInteraction;
 import com.liquidlab.view.UserInterface;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -43,16 +44,19 @@ public class BusinessLogic {
     private double nicBasePg;
     private double nicBaseVg;
     private double nicStrength;
+    private double nicTotalPercent;
     //PG Variables
     private double pgMl;
     private double pgGrams;
     private double pgTarget;
     private double pgPercent;
+    private double pgTotalPercent;
     //VG Variables
     private double vgMl;
     private double vgGrams;
     private double vgTarget;
     private double vgPercent;
+    private double vgTotalPercent;
 
     /**
      * Creates a BusinessLogic calculator to interface with the database and user interface.
@@ -193,7 +197,7 @@ public class BusinessLogic {
      *
      * @param mltm The amount of flavor required (in ML) for the recipe.
      */
-    private void setMlToMake(double mltm) {
+    public void setMlToMake(double mltm) {
         mlToMake = mltm;
     }
 
@@ -230,7 +234,7 @@ public class BusinessLogic {
      *
      * @param flpc The desired percentage of a flavor in the recipe.
      */
-    private void setFlavorPercent(double flpc) {
+    public void setFlavorPercent(double flpc) {
         flavorPercent = flpc;
     }
 
@@ -266,7 +270,7 @@ public class BusinessLogic {
      *
      * @param flgr The amount of individual flavor needed, in grams.
      */
-    private void setFlavorGrams(double flgr) {
+    public void setFlavorGrams(double flgr) {
         flavorGrams = flgr;
     }
     //Getters - VG
@@ -285,7 +289,7 @@ public class BusinessLogic {
      *
      * @param flal A list of all flavors retrieved from a DataBaseInteraction query
      */
-    private void setFlavors(ArrayList<Flavor> flal) {
+    public void setFlavors(ArrayList<Flavor> flal) {
         flavors = flal;
     }
 
@@ -303,7 +307,7 @@ public class BusinessLogic {
      *
      * @param ncamt The user-defined amount of nicotine to be used in the recipe, in mg/ml
      */
-    private void setNicAmt(double ncamt) {
+    public void setNicAmt(double ncamt) {
         nicAmt = ncamt;
     }
 
@@ -316,9 +320,6 @@ public class BusinessLogic {
         return nicTarget;
     }
 
-
-    //Setters - Class Handles
-
     /**
      * Sets nicTarget instance variable
      *
@@ -326,6 +327,35 @@ public class BusinessLogic {
      */
     private void setNicTarget(double nctg) {
         nicTarget = nctg;
+    }
+
+    private double getNicTotalPercent() {
+        return nicTotalPercent;
+    }
+
+    private void setNicTotalPercent(double ntpc) {
+        nicTotalPercent = ntpc;
+    }
+
+
+    //Setters - Class Handles
+
+    private double getPgTotalPercent() {
+        return pgTotalPercent;
+    }
+
+    private void setPgTotalPercent(double ptpc) {
+        pgTotalPercent = ptpc;
+    }
+    //Setters - Volume
+
+    private double getVgTotalPercent() {
+        return vgTotalPercent;
+    }
+    //Setters - Flavors
+
+    private void setVgTotalPercent(double vtpc) {
+        vgTotalPercent = vtpc;
     }
 
     /**
@@ -336,7 +366,6 @@ public class BusinessLogic {
     private double getNicMl() {
         return nicMl;
     }
-    //Setters - Volume
 
     /**
      * Sets nicMl instance variable
@@ -346,12 +375,11 @@ public class BusinessLogic {
     private void setNicMl(double ncml) {
         nicMl = ncml;
     }
-    //Setters - Flavors
 
     /**
      * Retrieves nicStrength instance variable
      *
-     * @return nicStrength The strength of the nicotine being used in the recipe, in mg/ml
+     * @return nicStrength The strength of the nicotine being used in the recipe, in mg
      */
     private double getNicStrength() {
         return nicStrength;
@@ -360,9 +388,9 @@ public class BusinessLogic {
     /**
      * Sets nicStrength instance variable
      *
-     * @param ncst The strength of the nicotine being used in the recipe, in mg/ml
+     * @param ncst The strength of the nicotine being used in the recipe, in mg
      */
-    private void setNicStrength(double ncst) {
+    public void setNicStrength(double ncst) {
         nicStrength = ncst;
     }
 
@@ -374,13 +402,14 @@ public class BusinessLogic {
     private double getNicGrams() {
         return nicGrams;
     }
+    //Setters - Nic
 
     /**
      * Sets nicGrams instance variable
      *
      * @param ncgr The amount of nicotine being used in the recipe, in grams.
      */
-    private void setNicGrams(double ncgr) {
+    public void setNicGrams(double ncgr) {
         nicGrams = ncgr;
     }
 
@@ -398,10 +427,9 @@ public class BusinessLogic {
      *
      * @param ncbpg The Base PG in the nicotine being used in the recipe.
      */
-    private void setNicBasePg(double ncbpg) {
+    public void setNicBasePg(double ncbpg) {
         nicBasePg = ncbpg;
     }
-    //Setters - Nic
 
     /**
      * Retrieves nicBaseVg instance variable
@@ -417,7 +445,7 @@ public class BusinessLogic {
      *
      * @param ncbvg The Base VG in the nicotine being used in the recipe.
      */
-    private void setNicBaseVg(double ncbvg) {
+    public void setNicBaseVg(double ncbvg) {
         nicBaseVg = ncbvg;
     }
 
@@ -435,7 +463,7 @@ public class BusinessLogic {
      *
      * @param pgtg The amount of PG required to reach the desired percentage for total volume selected.
      */
-    private void setPgTarget(double pgtg) {
+    public void setPgTarget(double pgtg) {
         pgTarget = pgtg;
     }
 
@@ -447,13 +475,14 @@ public class BusinessLogic {
     private double getPgPercent() {
         return pgPercent;
     }
+    //Setters - PG
 
     /**
      * Sets pgPercent instance variable
      *
      * @param pgpc The desired percentage of PG in the recipe.
      */
-    private void setPgPercent(double pgpc) {
+    public void setPgPercent(double pgpc) {
         pgPercent = pgpc;
     }
 
@@ -474,7 +503,6 @@ public class BusinessLogic {
     private void setPgMl(double pgml) {
         pgMl = pgml;
     }
-    //Setters - PG
 
     /**
      * Retrieves pgGrams instance variable
@@ -490,9 +518,10 @@ public class BusinessLogic {
      *
      * @param pggr The amount of PG being used in the recipe, in grams.
      */
-    private void setPgGrams(double pggr) {
+    public void setPgGrams(double pggr) {
         pgGrams = pggr;
     }
+    //Setters - VG
 
     /**
      * Retrieves vgTarget instance variable
@@ -508,7 +537,7 @@ public class BusinessLogic {
      *
      * @param vgtg The amount of VG required to reach the desired percentage for total volume selected.
      */
-    private void setVgTarget(double vgtg) {
+    public void setVgTarget(double vgtg) {
         vgTarget = vgtg;
     }
 
@@ -520,14 +549,13 @@ public class BusinessLogic {
     private double getVgPercent() {
         return vgPercent;
     }
-    //Setters - VG
 
     /**
      * Sets vgPercent instance variable
      *
      * @param vgpc The desired percentage of VG in the recipe.
      */
-    private void setVgPercent(double vgpc) {
+    public void setVgPercent(double vgpc) {
         vgPercent = vgpc;
     }
 
@@ -563,7 +591,7 @@ public class BusinessLogic {
      *
      * @param vggr The amount of VG being used in the recipe, in grams.
      */
-    private void setVgGrams(double vggr) {
+    public void setVgGrams(double vggr) {
         vgGrams = vggr;
     }
 
@@ -596,10 +624,7 @@ public class BusinessLogic {
         this.setFlavorPercent(.07);
         this.setPgPercent(.82);
         this.setVgPercent(.18);
-        setFlavorWeight(1);
-        setNicWeight(1.235);
-        setPgWeight(1.038);
-        setVgWeight(1.26);
+
 
     }
 
@@ -643,6 +668,13 @@ public class BusinessLogic {
      * Calculates the grams needed for base liquid elements; NIC, VG, and PG
      */
     private void calcBaseGrams() {
+        //Calculate Fractions
+        this.setNicBasePg(this.getNicBasePg() / 100);
+        this.setNicBaseVg(this.getNicBaseVg() / 100);
+        this.setPgPercent(this.getPgPercent() / 100);
+        this.setVgPercent(this.getVgPercent() / 100);
+
+
         //Calculate target NIC for recipe
         this.setNicTarget(this.getMlToMake() * this.getNicAmt());
         //Calculate ML of NIC needed
@@ -671,37 +703,103 @@ public class BusinessLogic {
      * Calculates the grams needed for each flavor individually. Requires a separate method because it is called
      * in an iterative pattern and this minimizes resources used.
      */
-    private void calcFlavorGrams() {
+    private void calcFlavorGrams(DecimalFormat df, int i) {
         this.setFlavorMl(this.getMlToMake() * this.getFlavorPercent());
-        this.setFlavorMlTotal(this.getFlavorMlTotal() + getFlavorMl());
+        this.setFlavorMlTotal(this.getFlavorMlTotal() + this.getFlavorMl());
         this.setFlavorGrams(this.getFlavorMl() * getFlavorWeight());
+        if (i == 0) {
+            //this.getUI().setFlavMl1(Double.parseDouble(df.format(this.getFlavorMl())));
+            //this.getUI().setFlavG1(Double.parseDouble(df.format(this.getFlavorGrams())));
+            //this.getUI().setFlavPercent1(Integer.parseInt(df.format(this.getFlavorPercent() * 100)));
+        } else if (i == 1) {
+            //this.getUI().setFlavMl2(Double.parseDouble(df.format(this.getFlavorMl())));
+            //this.getUI().setFlavG2(Double.parseDouble(df.format(this.getFlavorGrams())));
+            //this.getUI().setFlavPercent2(Integer.parseInt(df.format(this.getFlavorPercent() * 100)));
+        } else if (i == 2) {
+            //this.getUI().setFlavMl3(Double.parseDouble(df.format(this.getFlavorMl())));
+            //this.getUI().setFlavG3(Double.parseDouble(df.format(this.getFlavorGrams())));
+            //this.getUI().setFlavPercent3(Integer.parseInt(df.format(this.getFlavorPercent() * 100)));
+        }
+
     }
 
 
+    private void calcPercents() {
+        this.setNicTotalPercent((this.getNicMl() / this.getMlToMake()) * 100);
+        this.setPgTotalPercent((this.getPgMl() / this.getMlToMake()) * 100);
+        this.setVgTotalPercent((this.getVgMl() / this.getMlToMake()) * 100);
+    }
     /**
      * This method puts together all the pieces. It takes the formatted data from the <code>parseData()</code> method
      * and calculates the grams needed for each liquid component before displaying finished data to the user.
      */
     public void calculate() {
+        //Declare variables
+        DecimalFormat df;
+        //Initialize Variables
+        df = new DecimalFormat("#.##");
 
-        this.tests();
+        //Dummy values for intial calculation
+        this.setNicStrength(100);
+        this.setNicBasePg(0);
+        this.setNicBaseVg(100);
+        setFlavorWeight(1);
+        setNicWeight(1.235);
+        setPgWeight(1.038);
+        setVgWeight(1.26);
+
+        //Set variables as Doubles
+        this.setMlToMake(Double.parseDouble(getUI().getMlToMake().getText()));
+        this.setNicAmt(Double.parseDouble(getUI().getNic().getText()));
+        this.setPgPercent(Double.parseDouble(getUI().getPg().getText()));
+        this.setVgPercent(Double.parseDouble(getUI().getVg().getText()));
+        ///////////////////Notes/description?///////////////////////////
+        ///////////////////Vendors?/////////////////////////////////////
+
+
+        //Flavors
+        //Flavor flav1 = new Flavor(getUI().getFlav1().getText(), Integer.parseInt(getUI().getFlavPer().getText()));
+        //Flavor flav2 = new Flavor(getUI().getFlav2().getText(), Integer.parseInt(getUI().getFlavPer2().getText()));
+        //Flavor flav3 = new Flavor(getUI().getFlav3().getText(), Integer.parseInt(getUI().getFlavPer3().getText()));
+        ArrayList<Flavor> flList = new ArrayList<>();
+        //flList.add(flav1);
+        //flList.add(flav2);
+        //flList.add(flav3);
+        this.setFlavors(flList);
+        //this.tests();
 
 
         //Get data from database and format it
-        this.parseData();
-
+        //this.parseData();
         //Calculate flavor information first
-        for (Flavor fl : getFlavors()) {
+        int i = 0;
+        for (Flavor fl : this.getFlavors()) {
             this.setFlavorPercent(fl.getFraction());
-            this.calcFlavorGrams();
-            System.out.println(fl.getName() + ": " + this.getFlavorGrams());
+            this.calcFlavorGrams(df, i);
+            i++;
+            //lSystem.out.println(fl.getName() + ": " + this.getFlavorGrams());
         }
         //Calculate base information
         this.calcBaseGrams();
+        this.calcPercents();
 
         //Display to user
-        System.out.println("Nic = " + this.getNicGrams());
-        System.out.println("PG = " + this.getPgGrams());
-        System.out.println("VG = " + this.getVgGrams());
+        this.getUI().setPgMl(Double.parseDouble(df.format(this.getPgMl())));
+        this.getUI().setVgMl(Double.parseDouble(df.format(this.getVgMl())));
+        this.getUI().setNicMl(Double.parseDouble(df.format(this.getNicMl())));
+        this.getUI().setPgG(Double.parseDouble(df.format(this.getPgGrams())));
+        this.getUI().setVgG(Double.parseDouble(df.format(this.getVgGrams())));
+        this.getUI().setNicG(Double.parseDouble(df.format(this.getNicGrams())));
+        this.getUI().setNicPer(Integer.parseInt(df.format(this.getNicTotalPercent())));
+        this.getUI().setPgPer(Integer.parseInt(df.format(this.getPgTotalPercent())));
+        this.getUI().setVgPer(Integer.parseInt(df.format(this.getVgTotalPercent())));
+        //No method of retrieving percentages, yet
+
+        this.getUI().update();
+
+
+        // System.out.println("Nic = " + this.getNicGrams());
+        // System.out.println("PG = " + this.getPgGrams());
+        // System.out.println("VG = " + this.getVgGrams());
     }
 }
