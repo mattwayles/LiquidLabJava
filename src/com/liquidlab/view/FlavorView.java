@@ -25,6 +25,12 @@ public class FlavorView extends Control {
     private Text myFlavGText;
     private Text myFlavPercentText;
 
+    //Double values for calculations
+    private String myFlav;
+    private Double myFlavMl;
+    private Double myFlavG;
+    private Integer myFlavPercent;
+
     public FlavorView(UserInterface ui) {
         this.setUi(ui);
         //Left Grid
@@ -36,8 +42,13 @@ public class FlavorView extends Control {
         this.setFlavMlText(new Text("0.0"));
         this.setFlavGText(new Text("0.0"));
         this.setFlavPercentText(new Text("0.0"));
-        this.addToLeftGrid(this.getUi().getInput());
-        this.addToRightGrid(this.getUi().getOutput());
+        this.setFlav("New Flavor");
+        this.setFlavMl(0.5);
+        this.setFlavG(0.0);
+        this.setFlavPercent(0);
+        this.formatControls();
+        //this.addToLeftGrid(this.getUi().getInput());
+        //this.addToRightGrid(this.getUi().getOutput());
     }
 
     private static int getLrow() {
@@ -101,7 +112,6 @@ public class FlavorView extends Control {
         return myFlavLabel;
     }
 
-    //Right Grid
     public void setFlavLabel(Label fl) {
         myFlavLabel = fl;
     }
@@ -130,8 +140,41 @@ public class FlavorView extends Control {
         myFlavPercentText = fl;
     }
 
+    //Right Grid
+    public String getFlav() {
+        return myFlav;
+    }
+
+    public void setFlav(String fl) {
+        myFlav = fl;
+    }
+
+    public Double getFlavMl() {
+        return myFlavMl;
+    }
+
+    public void setFlavMl(Double fl) {
+        myFlavMl = fl;
+    }
+
+    public Double getFlavG() {
+        return myFlavG;
+    }
+
+    public void setFlavG(Double fl) {
+        myFlavG = fl;
+    }
+
+    public Integer getFlavPercent() {
+        return myFlavPercent;
+    }
+
+    public void setFlavPercent(Integer fl) {
+        myFlavPercent = fl;
+    }
+
     private void formatControls() {
-        String str = "Flavor " + (getLrow() - 1);
+        String str = "New Flavor";
         //Left Grid
         this.getVenField().setPromptText("Ven");
         this.getVenField().setId("text-field-vendor");
@@ -151,7 +194,6 @@ public class FlavorView extends Control {
     }
 
     public void addToLeftGrid(GridPane pane) {
-        this.formatControls();
         //Left Grid
         pane.add(this.getVenField(), 5, getLrow());
         pane.add(this.getFlavField(), 6, getLrow());   //flavors
@@ -161,6 +203,7 @@ public class FlavorView extends Control {
     }
 
     public void addToRightGrid(GridPane pane) {
+        this.translate();
         this.formatControls();
         //Right Grid
         pane.add(this.getFlavLabel(), 0, getRrow());
@@ -168,5 +211,18 @@ public class FlavorView extends Control {
         pane.add(this.getFlavGText(), 2, getRrow());
         pane.add(this.getFlavPercentText(), 3, getRrow());
         setRrow(getRrow() + 1);
+    }
+
+    private void translate()
+    {
+        this.setFlavLabel(new Label(this.getFlav()));
+        this.setFlavMlText(new Text(this.getFlavMl().toString()));
+        this.setFlavGText(new Text(this.getFlavG().toString()));
+        this.setFlavPercentText(new Text(this.getFlavPercent().toString()));
+
+    }
+    public static void reset()
+    {
+        setRrow(5);
     }
 }

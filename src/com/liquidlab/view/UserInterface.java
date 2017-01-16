@@ -288,6 +288,7 @@ public class UserInterface extends Application {
         final Label vgText;
         final Label vgUnit;
         final Text newFlav;
+        final Text buffer;
         Button addFlav;
 
 
@@ -303,6 +304,10 @@ public class UserInterface extends Application {
         vgUnit = new Label("%");
         newFlav = new Text("New Recipe");
         addFlav = new Button("+");
+        buffer = new Text();
+        this.getFlavors()[0].addToLeftGrid(this.getInput());
+        this.getFlavors()[1].addToLeftGrid(this.getInput());
+        this.getFlavors()[2].addToLeftGrid(this.getInput());
         this.setMlToMake(new TextField());
         this.setNic(new TextField());
         this.setPg(new TextField());
@@ -340,6 +345,9 @@ public class UserInterface extends Application {
         this.getInput().add(vgText, 0, 4);
         this.getInput().add(this.getVg(), 1, 4);
         this.getInput().add(vgUnit, 2, 4);
+        //Buffer
+        this.getInput().add(buffer, 0, 5);
+        buffer.setId("buffer-text");
 
         //Set control CSS IDs
         //notes.setId("text-area");
@@ -353,7 +361,7 @@ public class UserInterface extends Application {
         //this.getFlav4().setId("text-field-flavor");
         GridPane.setHalignment(newFlav, HPos.CENTER);
         GridPane.setValignment(newFlav, VPos.TOP);
-        this.getInput().add(this.getNotes(), 0, 5, 3, 10);   //notes
+        this.getInput().add(this.getNotes(), 0, 6, 3, 5);   //notes
         this.getInput().add(newFlav, 6, 0);    //new flavor label
         //this.formatTextField(this.getVen1(), 3);
         //this.getInput().add(this.getVen1(), 5, 1);    //vendors
@@ -402,6 +410,9 @@ public class UserInterface extends Application {
         this.getOutput().getColumnConstraints().addAll(col1, col2, col3, col4);
         //Create box to hold total values
         //Anchor components
+        this.getFlavors()[0].addToRightGrid(this.getOutput());
+        this.getFlavors()[1].addToRightGrid(this.getOutput());
+        this.getFlavors()[2].addToRightGrid(this.getOutput());
         rAnchor.getChildren().add(this.getOutput());
         BorderPane.setMargin(rAnchor, margin);
         AnchorPane.setTopAnchor(this.getOutput(), 10.0);
@@ -522,7 +533,7 @@ public class UserInterface extends Application {
     }
 
     private void flavorInit() {
-        this.setFlavors(new FlavorView[11]);
+        this.setFlavors(new FlavorView[10]);
         for (int i = 0; i < 3; i++) {
             this.getFlavors()[i] = new FlavorView(this);
         }
@@ -535,16 +546,15 @@ public class UserInterface extends Application {
         primaryStage.setTitle("LiquidLab");
         this.setPane(new BorderPane());
         this.varInit();
+        this.flavorInit();
         //Set Top Pane
         this.setTopPane(this.getPane());
         //Set Left pane
         this.setLeftPane(this.getPane());
         //Set Right Pane
         this.setRightPane(this.getPane());
-        //Set flavors
-        this.flavorInit();
         //Initialize grid in a scene
-        Scene scene = new Scene(this.getPane(), 1000, 500);
+        Scene scene = new Scene(this.getPane(), 1000, 530);
         //Set scene to initial window
         primaryStage.setScene(scene);
         //Link CSS stylesheet
@@ -569,13 +579,16 @@ public class UserInterface extends Application {
     }
 
     private void calcButtonAction() {
+        this.getFlavors()[0].reset();
         BusinessLogic bl = new BusinessLogic(this, getDB());
         bl.calculate();
     }
 
     private void addFlavButtonAction(Button btn) {
         this.getInput().getChildren().remove(btn);
-        this.getFlavors()[this.getRowCount()] = new FlavorView(this);
+        this.getFlavors()[this.getRowCount() - 1] = new FlavorView(this);
+        this.getFlavors()[this.getRowCount() - 1].addToLeftGrid(this.getInput());
+        this.getFlavors()[this.getRowCount() - 1].addToRightGrid(this.getOutput());
         if ((this.getRowCount()) < 10) {
             this.getInput().add(btn, 5, this.getRowCount() + 1);
             this.setRowCount(this.getRowCount() + 1);

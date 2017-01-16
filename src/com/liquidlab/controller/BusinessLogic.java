@@ -2,7 +2,9 @@ package com.liquidlab.controller;
 
 import com.liquidlab.Flavor;
 import com.liquidlab.model.DatabaseInteraction;
+import com.liquidlab.view.FlavorView;
 import com.liquidlab.view.UserInterface;
+import javafx.scene.text.Text;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -707,6 +709,13 @@ public class BusinessLogic {
         this.setFlavorMl(this.getMlToMake() * this.getFlavorPercent());
         this.setFlavorMlTotal(this.getFlavorMlTotal() + this.getFlavorMl());
         this.setFlavorGrams(this.getFlavorMl() * getFlavorWeight());
+        this.getUI().getFlavors()[0].setFlav(this.getUI().getFlavors()[0].getFlavField().getText());
+        this.getUI().getFlavors()[0].setFlavMl(this.getFlavorMl());
+        this.getUI().getFlavors()[0].setFlavG(this.getFlavorGrams());
+        this.getUI().getFlavors()[0].setFlavPercent(Integer.parseInt(df.format(this.getFlavorPercent() * 100)));
+
+
+
         if (i == 0) {
             //this.getUI().setFlavMl1(Double.parseDouble(df.format(this.getFlavorMl())));
             //this.getUI().setFlavG1(Double.parseDouble(df.format(this.getFlavorGrams())));
@@ -762,6 +771,7 @@ public class BusinessLogic {
         //Flavor flav2 = new Flavor(getUI().getFlav2().getText(), Integer.parseInt(getUI().getFlavPer2().getText()));
         //Flavor flav3 = new Flavor(getUI().getFlav3().getText(), Integer.parseInt(getUI().getFlavPer3().getText()));
         ArrayList<Flavor> flList = new ArrayList<>();
+        flList.add(new Flavor(this.getUI().getFlavors()[0].getFlavField().getText(), Double.parseDouble(this.getUI().getFlavors()[0].getFlavPerField().getText())));
         //flList.add(flav1);
         //flList.add(flav2);
         //flList.add(flav3);
@@ -773,7 +783,7 @@ public class BusinessLogic {
         //this.parseData();
         //Calculate flavor information first
         int i = 0;
-        for (Flavor fl : this.getFlavors()) {
+        for (Flavor fl : flList) {
             this.setFlavorPercent(fl.getFraction());
             this.calcFlavorGrams(df, i);
             i++;
