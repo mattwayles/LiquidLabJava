@@ -1,707 +1,482 @@
+//
+// Source code recreated from a .class file by IntelliJ IDEA
+// (powered by Fernflower decompiler)
+//
+
 package com.liquidlab.controller;
 
 import com.liquidlab.Flavor;
 import com.liquidlab.model.DatabaseInteraction;
 import com.liquidlab.view.UserInterface;
-
-import java.util.ArrayList;
-
-/**
- * BusinessLogic.java
- * Author: Matthew Blough-Wayles
- * Created: 12/19/2016
- * Edited: 12/22/2016
- * This class provides the Controller of the MVC relationship, dealing with logical calculations. It handles
- * parsing of data extracted from the DatabaseInteraction class as well as commands sent from the User Interface.
- * Finally, all mathematical calculations used to produce liquid gram measurements are achieved here as well.
- */
-
-
-///////******Once buttons are created, could these all pass as parameters instead of variables?? ***********//
+import java.text.DecimalFormat;
 
 public class BusinessLogic {
-    private static double flavorWeight;
-    private static double nicWeight;
-    private static double pgWeight;
-    private static double vgWeight;
-    //Handles to other classes
-    private UserInterface myUI;
-    private DatabaseInteraction myDB;
-    //Total volume
-    private double mlToMake;
-    //Flavor variables
-    private double flavorMl;
-    private double flavorGrams;
-    private double flavorPercent;
-    private double flavorMlTotal;
-    private ArrayList<Flavor> flavors;
-    //NIC Variables
-    private double nicMl;
-    private double nicAmt;
-    private double nicGrams;
-    private double nicTarget;
-    private double nicBasePg;
-    private double nicBaseVg;
-    private double nicStrength;
-    //PG Variables
-    private double pgMl;
-    private double pgGrams;
-    private double pgTarget;
-    private double pgPercent;
-    //VG Variables
-    private double vgMl;
-    private double vgGrams;
-    private double vgTarget;
-    private double vgPercent;
+    private static double ourFlavorWeight;
+    private static double ourNicWeight;
+    private static double ourPgWeight;
+    private static double ourVgWeight;
+    private static double ourMlToMake;
+    private static double ourFlavorMl;
+    private static double ourFlavorGrams;
+    private static double ourFlavorPercent;
+    private static double ourFlavorMlTotal;
+    private static double ourNicMl;
+    private static double ourNicAmt;
+    private static double ourNicGrams;
+    private static double ourNicTarget;
+    private static double ourNicBasePg;
+    private static double ourNicBaseVg;
+    private static double ourNicStrength;
+    private static double ourNicTotalPercent;
+    private static double ourPgMl;
+    private static double ourPgGrams;
+    private static double ourPgTarget;
+    private static double ourPgPercent;
+    private static double ourPgTotalPercent;
+    private static double ourVgMl;
+    private static double ourVgGrams;
+    private static double ourVgTarget;
+    private static double ourVgPercent;
+    private static double ourVgTotalPercent;
 
-    /**
-     * Creates a BusinessLogic calculator to interface with the database and user interface.
-     *
-     * @param ui The user interface that is sending commands to the BusinessLogic calculator.
-     * @param db The database that holds recipes information utilized by the BusinessLogic calculator.
-     */
-    public BusinessLogic(UserInterface ui, DatabaseInteraction db) {
-        this.setUI(ui);
-        this.setDB(db);
-        this.setFlavors(new ArrayList<>());
-    }
-
-    //Get Class handles
-
-    /**
-     * Retrieves flavorWeight class variable
-     *
-     * @return flavorWeight The user-defined weight of the flavors used (ml/g).
-     */
     private static double getFlavorWeight() {
-        return flavorWeight;
+        return ourFlavorWeight;
     }
 
-    /**
-     * Setss flavorWeight class variable
-     *
-     * @param flwt The user-defined weight of the flavors used (ml/g).
-     */
-    private static void setFlavorWeight(double flwt) {
-        flavorWeight = flwt;
+    private static void setFlavorWeight(double wt) {
+        ourFlavorWeight = wt;
     }
-    //Get Volume
 
-    /**
-     * Retrieves nicWeight class variable
-     *
-     * @return nicWeight The user-defined weight of the nicotine being used in the recipe.
-     */
     private static double getNicWeight() {
-        return nicWeight;
-    }
-    //Getters - Flavors
-
-    /**
-     * Sets nicWeight class variable
-     *
-     * @param ncwt The user-defined weight of the nicotine being used in the recipe.
-     */
-    private static void setNicWeight(double ncwt) {
-        nicWeight = ncwt;
+        return ourNicWeight;
     }
 
-    /**
-     * Retrieves pgWeight class variable
-     *
-     * @return pgWeight The user-defined weight of the PG being used in the recipe.
-     */
+    private static void setNicWeight(double wt) {
+        ourNicWeight = wt;
+    }
+
     private static double getPgWeight() {
-        return pgWeight;
+        return ourPgWeight;
     }
 
-    /**
-     * Sets pgWeight class variable
-     *
-     * @param pgwt The user-defined weight of the PG being used in the recipe.
-     */
-    private static void setPgWeight(double pgwt) {
-        pgWeight = pgwt;
+    private static void setPgWeight(double wt) {
+        ourPgWeight = wt;
     }
 
-    /**
-     * Retrieves vgWeight class variable
-     *
-     * @return vgWeight The user-defined weight of the vG being used in the recipe.
-     */
     private static double getVgWeight() {
-        return vgWeight;
+        return ourVgWeight;
     }
 
-    /**
-     * Sets vgWeight class variable
-     *
-     * @param vgwt The user-defined weight of the VG being used in the recipe.
-     */
-    private static void setVgWeight(double vgwt) {
-        vgWeight = vgwt;
-    }
-
-    /**
-     * Allows communication with the UserInterface class
-     *
-     * @return myUI    The UserInterface instance communicating with this BusinessLogic calculator.
-     */
-    private UserInterface getUI() {
-        return myUI;
-    }
-    //Getters - Nic
-
-    /**
-     * Sends communications to the UserInterface class
-     *
-     * @param userInt The UserInterface instance communicating with this BusinessLogic calculator.
-     */
-    private void setUI(UserInterface userInt) {
-        myUI = userInt;
-    }
-
-    /**
-     * Allows communication with the DatabaseInteraction class
-     *
-     * @return myDB The DatabaseInteraction class communicating with this BusinessLogic calculator.
-     */
-    private DatabaseInteraction getDB() {
-        return myDB;
-    }
-
-    /**
-     * Sends communication to the DatabaseInteraction class
-     *
-     * @param dbInt The DatabaseInteraction class communicating with this BusinessLogic calculator.
-     */
-    private void setDB(DatabaseInteraction dbInt) {
-        myDB = dbInt;
-    }
-
-    /**
-     * Retrieves mlToMake instance variable
-     *
-     * @return mlToMake The total amount of liquid to be produced.
-     */
-    private double getMlToMake() {
-        return mlToMake;
-    }
-
-    /**
-     * Sets flavorMl instance variable
-     *
-     * @param mltm The amount of flavor required (in ML) for the recipe.
-     */
-    private void setMlToMake(double mltm) {
-        mlToMake = mltm;
-    }
-
-    /**
-     * Retrieves flavorMl instance variable
-     *
-     * @return flavorMl The amount of flavor required (in ML) for the recipe.
-     */
-    private double getFlavorMl() {
-        return flavorMl;
-    }
-
-    /**
-     * Sets flavorPercent instance variable
-     *
-     * @param flml The desired percentage of a flavor in the recipe.
-     */
-    private void setFlavorMl(double flml) {
-        flavorMl = flml;
-    }
-
-    /**
-     * Retrieves flavorPercent instance variable
-     *
-     * @return flavorPercent The desired percentage of a flavor in the recipe.
-     */
-    private double getFlavorPercent() {
-        return flavorPercent;
-    }
-    //Getters - PG
-
-    /**
-     * Sets flavorPercent instance variable
-     *
-     * @param flpc The desired percentage of a flavor in the recipe.
-     */
-    private void setFlavorPercent(double flpc) {
-        flavorPercent = flpc;
-    }
-
-    /**
-     * Retrieves flavorMlTotal instance variable
-     *
-     * @return flavorMlTotal The total amount of all flavors in the recipe
-     */
-    private double getFlavorMlTotal() {
-        return flavorMlTotal;
-    }
-
-    /**
-     * Sets flavorMlTotal instance variable
-     *
-     * @param fltl The total amount of all flavors in the recipe
-     */
-    private void setFlavorMlTotal(double fltl) {
-        flavorMlTotal = fltl;
-    }
-
-    /**
-     * Retrieves flavorGrams instance variable
-     *
-     * @return flavorGrams The amount of individual flavor needed, in grams.
-     */
-    private double getFlavorGrams() {
-        return flavorGrams;
-    }
-
-    /**
-     * Sets flavorGrams instance variable
-     *
-     * @param flgr The amount of individual flavor needed, in grams.
-     */
-    private void setFlavorGrams(double flgr) {
-        flavorGrams = flgr;
-    }
-    //Getters - VG
-
-    /**
-     * Retrieves flavors instance ArrayList
-     *
-     * @return flavors  A list of all flavors retrieved from a DataBaseInteraction query
-     */
-    private ArrayList<Flavor> getFlavors() {
-        return flavors;
-    }
-
-    /**
-     * Creates a new flavors instance ArrayList
-     *
-     * @param flal A list of all flavors retrieved from a DataBaseInteraction query
-     */
-    private void setFlavors(ArrayList<Flavor> flal) {
-        flavors = flal;
-    }
-
-    /**
-     * Retrieves nicAmt instance variable
-     *
-     * @return nicAmt The user-defined amount of nicotine to be used in the recipe, in mg/ml
-     */
-    private double getNicAmt() {
-        return nicAmt;
-    }
-
-    /**
-     * Sets nicAmt instance variable
-     *
-     * @param ncamt The user-defined amount of nicotine to be used in the recipe, in mg/ml
-     */
-    private void setNicAmt(double ncamt) {
-        nicAmt = ncamt;
-    }
-
-    /**
-     * Retrieves nicTarget instance variable
-     *
-     * @return nicTarget The amount of nicotine required to reach the desired percentage for total volume selected.
-     */
-    private double getNicTarget() {
-        return nicTarget;
+    private static void setVgWeight(double wt) {
+        ourVgWeight = wt;
     }
 
 
-    //Setters - Class Handles
-
-    /**
-     * Sets nicTarget instance variable
-     *
-     * @param nctg The amount of nicotine required to reach the desired percentage for total volume selected.
-     */
-    private void setNicTarget(double nctg) {
-        nicTarget = nctg;
+    private static double getMlToMake() {
+        return ourMlToMake;
     }
 
-    /**
-     * Retrieves nicMl instance variable
-     *
-     * @return nicMl The amount of nicotine contained in the recipe, in ML.
-     */
-    private double getNicMl() {
-        return nicMl;
-    }
-    //Setters - Volume
-
-    /**
-     * Sets nicMl instance variable
-     *
-     * @param ncml The amount of nicotine contained in the recipe, in ML.
-     */
-    private void setNicMl(double ncml) {
-        nicMl = ncml;
-    }
-    //Setters - Flavors
-
-    /**
-     * Retrieves nicStrength instance variable
-     *
-     * @return nicStrength The strength of the nicotine being used in the recipe, in mg/ml
-     */
-    private double getNicStrength() {
-        return nicStrength;
+    private static void setMlToMake(double ml) {
+        ourMlToMake = ml;
     }
 
-    /**
-     * Sets nicStrength instance variable
-     *
-     * @param ncst The strength of the nicotine being used in the recipe, in mg/ml
-     */
-    private void setNicStrength(double ncst) {
-        nicStrength = ncst;
+    private static double getFlavorMl() {
+        return ourFlavorMl;
     }
 
-    /**
-     * Retrieves nicGrams instance variable
-     *
-     * @return nicGrams The amount of nicotine being used in the recipe, in grams.
-     */
-    private double getNicGrams() {
-        return nicGrams;
+    private static void setFlavorMl(double ml) {
+        ourFlavorMl = ml;
     }
 
-    /**
-     * Sets nicGrams instance variable
-     *
-     * @param ncgr The amount of nicotine being used in the recipe, in grams.
-     */
-    private void setNicGrams(double ncgr) {
-        nicGrams = ncgr;
+    private static double getFlavorPercent() {
+        return ourFlavorPercent;
     }
 
-    /**
-     * Retrieves nicBasePg instance variable
-     *
-     * @return nicBasePg The Base PG in the nicotine being used in the recipe.
-     */
-    private double getNicBasePg() {
-        return nicBasePg;
+    private static void setFlavorPercent(double pc) {
+        ourFlavorPercent = pc;
     }
 
-    /**
-     * Sets nicBasePg instance variable
-     *
-     * @param ncbpg The Base PG in the nicotine being used in the recipe.
-     */
-    private void setNicBasePg(double ncbpg) {
-        nicBasePg = ncbpg;
-    }
-    //Setters - Nic
-
-    /**
-     * Retrieves nicBaseVg instance variable
-     *
-     * @return nicBaseVg The Base VG in the nicotine being used in the recipe.
-     */
-    private double getNicBaseVg() {
-        return nicBaseVg;
+    private static double getFlavorMlTotal() {
+        return ourFlavorMlTotal;
     }
 
-    /**
-     * Sets nicBaseVg instance variable
-     *
-     * @param ncbvg The Base VG in the nicotine being used in the recipe.
-     */
-    private void setNicBaseVg(double ncbvg) {
-        nicBaseVg = ncbvg;
+    private static void setFlavorMlTotal(double ml) {
+        ourFlavorMlTotal = ml;
     }
 
-    /**
-     * Retrieves pgTarget instance variable
-     *
-     * @return pgTarget The amount of PG required to reach the desired percentage for total volume selected.
-     */
-    private double getPgTarget() {
-        return pgTarget;
+    private static double getFlavorGrams() {
+        return ourFlavorGrams;
     }
 
-    /**
-     * Sets pgTarget instance variable
-     *
-     * @param pgtg The amount of PG required to reach the desired percentage for total volume selected.
-     */
-    private void setPgTarget(double pgtg) {
-        pgTarget = pgtg;
+    private static void setFlavorGrams(double gr) {
+        ourFlavorGrams = gr;
     }
 
-    /**
-     * Retrieves pgPercent instance variable
-     *
-     * @return pgPercent The desired percentage of PG in the recipe.
-     */
-    private double getPgPercent() {
-        return pgPercent;
+    private static double getNicAmt() {
+        return ourNicAmt;
     }
 
-    /**
-     * Sets pgPercent instance variable
-     *
-     * @param pgpc The desired percentage of PG in the recipe.
-     */
-    private void setPgPercent(double pgpc) {
-        pgPercent = pgpc;
+    private static void setNicAmt(double nic) {
+        ourNicAmt = nic;
     }
 
-    /**
-     * Retrieves pgMl instance variable
-     *
-     * @return pgMl The amount of PG required (in ML) for the recipe.
-     */
-    private double getPgMl() {
-        return pgMl;
+    private static double getNicTarget() {
+        return ourNicTarget;
     }
 
-    /**
-     * Sets pgMl instance variable
-     *
-     * @param pgml The amount of PG required (in ML) for the recipe.
-     */
-    private void setPgMl(double pgml) {
-        pgMl = pgml;
-    }
-    //Setters - PG
-
-    /**
-     * Retrieves pgGrams instance variable
-     *
-     * @return pgGrams The amount of PG being used in the recipe, in grams.
-     */
-    private double getPgGrams() {
-        return pgGrams;
+    private static void setNicTarget(double nic) {
+        ourNicTarget = nic;
     }
 
-    /**
-     * Sets pgGrams instance variable
-     *
-     * @param pggr The amount of PG being used in the recipe, in grams.
-     */
-    private void setPgGrams(double pggr) {
-        pgGrams = pggr;
+    private static double getNicTotalPercent() {
+        return ourNicTotalPercent;
     }
 
-    /**
-     * Retrieves vgTarget instance variable
-     *
-     * @return vgTarget The amount of VG required to reach the desired percentage for total volume selected.
-     */
-    private double getVgTarget() {
-        return vgTarget;
+    private static void setNicTotalPercent(double nic) {
+        ourNicTotalPercent = nic;
     }
 
-    /**
-     * Sets vgTarget instance variable
-     *
-     * @param vgtg The amount of VG required to reach the desired percentage for total volume selected.
-     */
-    private void setVgTarget(double vgtg) {
-        vgTarget = vgtg;
+    private static double getPgTotalPercent() {
+        return ourPgTotalPercent;
     }
 
-    /**
-     * Retrieves vgPercent instance variable
-     *
-     * @return vgPercent The desired percentage of VG in the recipe.
-     */
-    private double getVgPercent() {
-        return vgPercent;
-    }
-    //Setters - VG
-
-    /**
-     * Sets vgPercent instance variable
-     *
-     * @param vgpc The desired percentage of VG in the recipe.
-     */
-    private void setVgPercent(double vgpc) {
-        vgPercent = vgpc;
+    private static void setPgTotalPercent(double pc) {
+        ourPgTotalPercent = pc;
     }
 
-    /**
-     * Retrieves vgMl instance variable
-     *
-     * @return vgMl The amount of VG required (in ML) for the recipe.
-     */
-    private double getVgMl() {
-        return vgMl;
+    private static double getVgTotalPercent() {
+        return ourVgTotalPercent;
     }
 
-    /**
-     * Sets vgMl instance variable
-     *
-     * @param vgml The amount of VG required (in ML) for the recipe.
-     */
-    private void setVgMl(double vgml) {
-        vgMl = vgml;
+    private static void setVgTotalPercent(double pc) {
+        ourVgTotalPercent = pc;
     }
 
-    /**
-     * Retrieves vgGrams instance variable
-     *
-     * @return vgGrams The amount of VG being used in the recipe, in grams.
-     */
-    private double getVgGrams() {
-        return vgGrams;
+    private static double getNicMl() {
+        return ourNicMl;
     }
 
-    /**
-     * Sets vgGrams instance variable
-     *
-     * @param vggr The amount of VG being used in the recipe, in grams.
-     */
-    private void setVgGrams(double vggr) {
-        vgGrams = vggr;
+    private static void setNicMl(double ml) {
+        ourNicMl = ml;
     }
 
-    /////////////////////////////TRASH METHOD, throw out!//////////////////////////
-    private void tests() {
-        setUI(this.getUI());
+    private static double getNicStrength() {
+        return ourNicStrength;
+    }
 
-        //Test1
-        this.setNicBasePg(.60);
-        this.setNicBaseVg(.40);
-        this.setNicStrength(.013);
-        this.setNicAmt(.012);
-        this.setMlToMake(30);
-        this.setFlavorPercent(.14);
-        this.setPgPercent(.40);
-        this.setVgPercent(.60);
-        setFlavorWeight(.015);
-        setNicWeight(1.239);
-        setPgWeight(1.036);
-        setVgWeight(1.21);
+    private static void setNicStrength(double nic) {
+        ourNicStrength = nic;
+    }
 
+    private static double getNicGrams() {
+        return ourNicGrams;
+    }
 
-        //Test2
+    private static void setNicGrams(double gr) {
+        ourNicGrams = gr;
+    }
 
-        this.setNicBasePg(.88);
-        this.setNicBaseVg(.12);
-        this.setNicStrength(.004);
-        this.setNicAmt(.003);
-        this.setMlToMake(250);
-        this.setFlavorPercent(.07);
-        this.setPgPercent(.82);
-        this.setVgPercent(.18);
-        setFlavorWeight(1);
-        setNicWeight(1.235);
-        setPgWeight(1.038);
-        setVgWeight(1.26);
+    private static double getNicBasePg() {
+        return ourNicBasePg;
+    }
+
+    private static void setNicBasePg(double nic) {
+        ourNicBasePg = nic;
+    }
+
+    private static double getNicBaseVg() {
+        return ourNicBaseVg;
+    }
+
+    private static void setNicBaseVg(double nic) {
+        ourNicBaseVg = nic;
+    }
+
+    private static double getPgTarget() {
+        return ourPgTarget;
+    }
+
+    private static void setPgTarget(double pg) {
+        ourPgTarget = pg;
+    }
+
+    private static double getPgPercent() {
+        return ourPgPercent;
+    }
+
+    private static void setPgPercent(double pgpc) {
+        ourPgPercent = pgpc;
+    }
+
+    private static double getPgMl() {
+        return ourPgMl;
+    }
+
+    private static void setPgMl(double ml) {
+        ourPgMl = ml;
+    }
+
+    private static double getPgGrams() {
+        return ourPgGrams;
+    }
+
+    private static void setPgGrams(double gr) {
+        ourPgGrams = gr;
+    }
+
+    private static double getVgTarget() {
+        return ourVgTarget;
+    }
+
+    private static void setVgTarget(double vg) {
+        ourVgTarget = vg;
+    }
+
+    private static double getVgPercent() {
+        return ourVgPercent;
+    }
+
+    private static void setVgPercent(double pc) {
+        ourVgPercent = pc;
+    }
+
+    private static double getVgMl() {
+        return ourVgMl;
+    }
+
+    private static void setVgMl(double ml) {
+        ourVgMl = ml;
+    }
+
+    private static double getVgGrams() {
+        return ourVgGrams;
+    }
+
+    private static void setVgGrams(double gr) {
+        ourVgGrams = gr;
+    }
+
+    public static void parseData(String fl) {
+        DatabaseInteraction.selectFlavor(fl);
+        UserInterface.getNotes().setText(DatabaseInteraction.getResults().get(2));
+        String flavors = DatabaseInteraction.getResults().get(1);
+        flavors = flavors.replaceAll(",", "%");
+        String[] results = flavors.split("%");
+
+        int j;
+        for(j = 0; j < results.length; ++j) {
+            String i = results[j].trim();
+            results[j] = i;
+        }
+
+        j = 0;
+
+        for(int i = 0; i < results.length; i += 3) {
+            if(!results[i + 1].isEmpty()) {
+                UserInterface.getFlavors()[j].getVenField().setText(results[i + 1]);
+            }
+
+            UserInterface.getFlavors()[j].getFlavField().setText(results[i + 2]);
+            UserInterface.getFlavors()[j].getFlavPerField().setText(results[i]);
+            ++j;
+        }
 
     }
 
-    /**
-     * Communicates with DatabaseInteraction class to pull a user-defined flavor from the database. Splits database
-     * information into an array and extracts relevant name, flavor, and description information. Once data is
-     * formatted correctly, it is sent off for calculation.
-     */
-    private void parseData() {
-        //Local variables
-        String flavors;
-        String[] results;
-        Flavor flav;
+    public static String combineFlavorData() {
+        String flListToAdd = "";
 
-        //Declarations
-        flav = null;
+        for(int i = 0; i < UserInterface.getFlavors().length; ++i) {
+            if(UserInterface.getFlavors()[i] != null) {
+                String percent = UserInterface.getFlavors()[i].getFlavPerField().getText();
+                String flavor;
+                if(!UserInterface.getFlavors()[i].getVenField().getText().isEmpty()) {
+                    flavor = UserInterface.getFlavors()[i].getVenField().getText() + "," + UserInterface.getFlavors()[i].getFlavField().getText();
+                } else {
+                    flavor = "," + UserInterface.getFlavors()[i].getFlavField().getText();
+                }
 
-        //Retrieve requested information from database
-        this.getDB().selectFlavor("Vanilla Coke"); //this will eventually be a string selected by user
-        flavors = this.getDB().getResults().get(1); //Right now, we're only concerned with flavor list
-        //Format data for calculation
-        flavors = flavors.replaceAll(",", "%"); //single delimiter to deal with
-        results = flavors.split("%"); //This gives us Name, Flavor List, Desc - for later GUI interaction
-        for (int i = 0; i < results.length; i++) {
-            String res = results[i].trim(); //remove whitespace
-            if ((i & 1) == 0) //even iterations hold flavor percentages
-            {
-                double val = Double.parseDouble(res); //convert string to double
-                flav = new Flavor(); //create new flavor instance
-                flav.setPercentage(val);
-            } else //odd iterations hold flavor names
-            {
-                assert flav != null;
-                flav.setName(res);  //flavor was created by last iteration, assign the name
-                this.getFlavors().add(flav); //add flavor to calculation ArrayList
+                if(flavor.isEmpty() && !percent.isEmpty()) {
+                    UserInterface.msgBox("ERROR", 8);
+                    flListToAdd = "error";
+                    break;
+                }
+
+                if(!flavor.isEmpty() && !flavor.equals(",") && percent.isEmpty()) {
+                    UserInterface.msgBox("ERROR", 7);
+                    flListToAdd = "error";
+                    break;
+                }
+
+                if(!flavor.isEmpty() && !percent.isEmpty()) {
+                    if(i > 0) {
+                        flListToAdd = flListToAdd + ", ";
+                    }
+
+                    flListToAdd = flListToAdd + percent + "% " + flavor;
+                }
             }
         }
+
+        return flListToAdd;
     }
 
-    /**
-     * Calculates the grams needed for base liquid elements; NIC, VG, and PG
-     */
-    private void calcBaseGrams() {
-        //Calculate target NIC for recipe
-        this.setNicTarget(this.getMlToMake() * this.getNicAmt());
-        //Calculate ML of NIC needed
-        this.setNicMl((this.getMlToMake() / this.getNicStrength()) * this.getNicAmt());
-        //Calculate grams of NIC needed
-        this.setNicGrams(this.getNicMl() * getNicWeight());
-
-        //Calculate target PG for recipe
-        this.setPgTarget((this.getMlToMake() * this.getPgPercent()) - (this.getNicTarget() * this.getNicBasePg()));
-        //Calculate ML of PG needed
-        this.setPgMl(this.getPgTarget() - ((this.getNicMl() - this.getNicTarget()) *
-                this.getNicBasePg()) - this.getFlavorMlTotal());
-        //Calculate grams of PG needed
-        this.setPgGrams(this.getPgMl() * getPgWeight());
-
-        //Calculate target VG for recipe
-        this.setVgTarget((this.getMlToMake() * this.getVgPercent()) - (this.getNicTarget() * this.getNicBaseVg()));
-        //Calculate ML of VG needed
-        this.setVgMl(this.getVgTarget() - ((this.getNicMl() - this.getNicTarget()) *
-                this.getNicBaseVg()));
-        //Calculate grams of VG needed
-        this.setVgGrams(this.getVgMl() * getVgWeight());
+    private static void calcBaseGrams() {
+        setNicBasePg(getNicBasePg() / 100.0);
+        setNicBaseVg(getNicBaseVg() / 100.0);
+        setPgPercent(getPgPercent() / 100.0);
+        setVgPercent(getVgPercent() / 100.0);
+        setNicTarget(getMlToMake() * getNicAmt());
+        setNicMl(getMlToMake() / getNicStrength() * getNicAmt());
+        setNicGrams(getNicMl() * getNicWeight());
+        setPgTarget(getMlToMake() * getPgPercent() - getNicTarget() * getNicBasePg());
+        setPgMl(getPgTarget() - (getNicMl() - getNicTarget()) * getNicBasePg() - getFlavorMlTotal());
+        setPgGrams(getPgMl() * getPgWeight());
+        setVgTarget(getMlToMake() * getVgPercent() - getNicTarget() * getNicBaseVg());
+        setVgMl(getVgTarget() - (getNicMl() - getNicTarget()) * getNicBaseVg());
+        setVgGrams(getVgMl() * getVgWeight());
     }
 
-    /**
-     * Calculates the grams needed for each flavor individually. Requires a separate method because it is called
-     * in an iterative pattern and this minimizes resources used.
-     */
-    private void calcFlavorGrams() {
-        this.setFlavorMl(this.getMlToMake() * this.getFlavorPercent());
-        this.setFlavorMlTotal(this.getFlavorMlTotal() + getFlavorMl());
-        this.setFlavorGrams(this.getFlavorMl() * getFlavorWeight());
-    }
-
-
-    /**
-     * This method puts together all the pieces. It takes the formatted data from the <code>parseData()</code> method
-     * and calculates the grams needed for each liquid component before displaying finished data to the user.
-     */
-    public void calculate() {
-
-        this.tests();
-
-
-        //Get data from database and format it
-        this.parseData();
-
-        //Calculate flavor information first
-        for (Flavor fl : getFlavors()) {
-            this.setFlavorPercent(fl.getFraction());
-            this.calcFlavorGrams();
-            System.out.println(fl.getName() + ": " + this.getFlavorGrams());
+    private static void calcFlavorGrams(Flavor fl, DecimalFormat df, int i) {
+        setFlavorPercent(fl.getFraction());
+        setFlavorMl(getMlToMake() * getFlavorPercent());
+        setFlavorMlTotal(getFlavorMlTotal() + getFlavorMl());
+        setFlavorGrams(getFlavorMl() * getFlavorWeight());
+        if(!fl.getVen().isEmpty()) {
+            UserInterface.getFlavors()[i].setFlav("[" + fl.getVen() + "] " + fl.getName());
+        } else {
+            UserInterface.getFlavors()[i].setFlav(fl.getName());
         }
-        //Calculate base information
-        this.calcBaseGrams();
 
-        //Display to user
-        System.out.println("Nic = " + this.getNicGrams());
-        System.out.println("PG = " + this.getPgGrams());
-        System.out.println("VG = " + this.getVgGrams());
+        UserInterface.getFlavors()[i].setFlavMl(Double.parseDouble(df.format(getFlavorMl())));
+        UserInterface.getFlavors()[i].setFlavG(Double.parseDouble(df.format(getFlavorGrams())));
+        UserInterface.getFlavors()[i].setFlavPercent(Double.parseDouble(df.format(getFlavorPercent() * 100.0)));
+    }
+
+    private static void calcPercents() {
+        setNicTotalPercent(getNicMl() / getMlToMake() * 100.0);
+        setPgTotalPercent(getPgMl() / getMlToMake() * 100.0);
+        setVgTotalPercent(getVgMl() / getMlToMake() * 100.0);
+    }
+
+    public static void calculate() {
+        DecimalFormat df = new DecimalFormat("#.##");
+        if(!UserInterface.getMlToMake().getText().isEmpty() && !UserInterface.getPg().getText().isEmpty()) {
+            if(UserInterface.getNic().getText().isEmpty()) {
+                UserInterface.getNic().setText("0");
+            }
+
+            if(getUserValues()) {
+                UserInterface.msgBox("ERROR", 6);
+            } else {
+                setMlToMake(Double.parseDouble(UserInterface.getMlToMake().getText()));
+                setNicAmt(Double.parseDouble(UserInterface.getNic().getText()));
+                setPgPercent(Double.parseDouble(UserInterface.getPg().getText()));
+                setVgPercent(Double.parseDouble(UserInterface.getVg().getText()));
+
+                for(int i = 0; i < UserInterface.getRowCount(); ++i) {
+                    if(UserInterface.getFlavors()[i] != null) {
+                        String ven = UserInterface.getFlavors()[i].getVenField().getText();
+                        String flavor = UserInterface.getFlavors()[i].getFlavField().getText();
+                        String percent = UserInterface.getFlavors()[i].getFlavPerField().getText();
+                        if(!flavor.isEmpty() && !percent.isEmpty()) {
+                            if(!ven.isEmpty()) {
+                                calcFlavorGrams(new Flavor(ven, flavor, Double.parseDouble(percent)), df, i);
+                            } else {
+                                calcFlavorGrams(new Flavor(flavor, Double.parseDouble(percent)), df, i);
+                            }
+                        } else if(!flavor.isEmpty() && percent.isEmpty()) {
+                            UserInterface.msgBox("ERROR", 7);
+                        } else if(flavor.isEmpty() && !percent.isEmpty()) {
+                            if(!ven.isEmpty()) {
+                                calcFlavorGrams(new Flavor(ven, "No-Name Flavor", Double.parseDouble(percent)), df, i);
+                            } else {
+                                calcFlavorGrams(new Flavor("No-Name Flavor", Double.parseDouble(percent)), df, i);
+                            }
+                        }
+                    }
+                }
+
+                calcBaseGrams();
+                calcPercents();
+                if(getPgMl() < 0.0) {
+                    UserInterface.msgBox("ERROR", 2);
+                } else if(getVgMl() < 0.0) {
+                    UserInterface.msgBox("ERROR", 3);
+                } else if(getNicMl() < 0.0) {
+                    UserInterface.msgBox("ERROR", 4);
+                } else {
+                    UserInterface.setPgMl(Double.parseDouble(df.format(getPgMl())));
+                    UserInterface.setVgMl(Double.parseDouble(df.format(getVgMl())));
+                    UserInterface.setNicMl(Double.parseDouble(df.format(getNicMl())));
+                    UserInterface.setPgG(Double.parseDouble(df.format(getPgGrams())));
+                    UserInterface.setVgG(Double.parseDouble(df.format(getVgGrams())));
+                    UserInterface.setNicG(Double.parseDouble(df.format(getNicGrams())));
+                    UserInterface.setNicPer(Double.parseDouble(df.format(getNicTotalPercent())));
+                    UserInterface.setPgPer(Double.parseDouble(df.format(getPgTotalPercent())));
+                    UserInterface.setVgPer(Double.parseDouble(df.format(getVgTotalPercent())));
+                    UserInterface.update();
+                    reset();
+                }
+
+            }
+        } else {
+            if(UserInterface.getMlToMake().getText().isEmpty()) {
+                UserInterface.msgBox("ERROR", 0);
+            } else {
+                UserInterface.msgBox("ERROR", 1);
+            }
+
+        }
+    }
+
+    public static Boolean getUserValues() {
+        Boolean missingValue = false;
+        DatabaseInteraction.selectValues();
+        if(!DatabaseInteraction.getResults().isEmpty()) {
+            setNicStrength(Double.parseDouble(DatabaseInteraction.getResults().get(0)));
+            setNicBasePg(Double.parseDouble(DatabaseInteraction.getResults().get(1)));
+            setNicBaseVg(Double.parseDouble(DatabaseInteraction.getResults().get(2)));
+            setFlavorWeight(Double.parseDouble(DatabaseInteraction.getResults().get(3)));
+            setNicWeight(Double.parseDouble(DatabaseInteraction.getResults().get(4)));
+            setPgWeight(Double.parseDouble(DatabaseInteraction.getResults().get(5)));
+            setVgWeight(Double.parseDouble(DatabaseInteraction.getResults().get(6)));
+        } else {
+            missingValue = true;
+        }
+
+        return missingValue;
+    }
+
+    private static void reset() {
+        for(int i = 0; i < UserInterface.getFlavors().length; ++i) {
+            if(UserInterface.getFlavors()[i] != null) {
+                UserInterface.getFlavors()[i].setFlavMl(0.0);
+                UserInterface.getFlavors()[i].setFlavG(0.0);
+                UserInterface.getFlavors()[i].setFlavPercent(0.0);
+            }
+        }
+
+        setMlToMake(0.0);
+        setFlavorMlTotal(0.0);
+        setFlavorGrams(0.0);
+        setFlavorMl(0.0);
+        setFlavorPercent(0.0);
+        setNicTarget(0.0);
+        setNicAmt(0.0);
+        setNicMl(0.0);
+        setNicGrams(0.0);
+        setNicTotalPercent(0.0);
+        setPgTarget(0.0);
+        setPgMl(0.0);
+        setPgGrams(0.0);
+        setPgPercent(0.0);
+        setPgTotalPercent(0.0);
+        setVgTarget(0.0);
+        setVgMl(0.0);
+        setVgGrams(0.0);
+        setVgPercent(0.0);
+        setVgTotalPercent(0.0);
+        getUserValues();
     }
 }

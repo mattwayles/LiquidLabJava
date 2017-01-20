@@ -1,23 +1,18 @@
 package com.liquidlab;
 //Package imports
 
-import com.liquidlab.controller.BusinessLogic;
-import com.liquidlab.model.DatabaseInteraction;
-import com.liquidlab.view.UserInterface;
-
-import javax.swing.*;
-
-/**
+/*
  * Main.java
  * Author: Matthew Blough-Wayles
  * Created: 12/19/2016
  * Edited: 12/22/2016
  * This class runs the application and creates all the necessary interactive objects.
- */
-public class Main {
+
+
+ public class Main {
     //Create handles to all classes in MVC
     private static DatabaseInteraction dbInt = new DatabaseInteraction();
-    private static UserInterface ui = new UserInterface(getDB());
+ private static UserInterface ui = new UserInterface(getDB());
     private static BusinessLogic bl = new BusinessLogic(getUI(), getDB());
 
     //Greate methods to retrieve class handles
@@ -41,7 +36,6 @@ public class Main {
 
     private static void runApp() {
         dbManipulations(getDB());
-
         getBL().calculate();
 
     }
@@ -75,3 +69,4 @@ public class Main {
         dbInt.selectFlavor("Cherry Coke");
     }
 }
+ */

@@ -1,0 +1,140 @@
+/* Sets background scene */
+.root {
+    -fx-background-image: url("bg.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-position: center;
+    -fx-background-size: cover;
+    }
+.menu-bar {
+    -fx-background-color: linear-gradient(#61a2b1, #2a5058);
+    -fx-font-size: 8px;
+    }
+.menu-item {
+    -fx-font-size: 8px;
+    -fx-background-color: black;
+}
+.menu-item:hover {
+    -fx-background-color: linear-gradient(#61a2b1, #2a5058);
+    }
+/* Used by all labels */
+.text {
+    -fx-font-size: 10px;
+    -fx-font-weight: bold;
+    -fx-fill: #FFFFFF;
+    }
+/* Used by all buttons */
+.button {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#61a2b1, #2a5058);
+    -fx-effect: dropshadow( three-pass-box, rgba(0,0,0,0.6), 5, 0.0, 0 , 1 );
+    }
+
+/* Used by all buttons */
+.button:hover {
+    -fx-background-color: linear-gradient(#2a5058, #61a2b1);
+    }
+#add-button {
+    -fx-font-size: 3px;
+    -fx-padding: 0 5 0 5;
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#61a2b1, #2a5058);
+    -fx-effect: dropshadow( three-pass-box, rgba(0,0,0,0.6), 5, 0.0, 0 , 1 );
+        }
+/* Used by combo box */
+.combo-box .list-cell {
+    -fx-pref-width: 165px;
+    -fx-background-color: linear-gradient(#61a2b1, #2a5058);
+    }
+.combo-box .arrow-button {
+    -fx-background-color: linear-gradient(#61a2b1, #2a5058);
+    }
+.combo-box .arrow {
+    -fx-background-color: white;
+    }
+/* Used by notes text area */
+.text-area {
+    -fx-pref-height: 150px;
+    -fx-pref-width: 150px;
+    -fx-wrap-text: true;
+    -fx-font-size: 9px;
+    -fx-text-fill: #305962;
+    }
+/* Used by all text fields */
+.text-field {
+    -fx-alignment: baseline-right;
+    -fx-pref-width: 38px;
+    -fx-font-size: 9px;
+    -fx-text-fill: #305962;
+    }
+#buffer-text {
+    -fx-font-size: 16px;
+    }
+#text-field-vendor {
+    -fx-alignment: baseline-center;
+    -fx-pref-width: 35px;
+    }
+#text-field-flavor {
+    -fx-alignment: baseline-left;
+    -fx-pref-width: 150px;
+    }
+#text-field-recipe {
+    -fx-alignment: baseline-center;
+    -fx-font-size: 11px;
+    -fx-text-fill: #305962;
+}
+/* Used by LiquidLab title */
+#title-text {
+    -fx-font-size: 38px;
+    -fx-font-family: "Arial Black";
+    -fx-fill: #90edfc;
+    -fx-effect: innershadow( three-pass-box, rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2);
+
+    }
+/* Used to format L & R grids */
+#left-grid {
+    -fx-hgap: 10;
+    -fx-vgap: 10;
+    }
+#right-grid {
+    -fx-hgap: 35;
+    -fx-vgap: 10;
+    }
+/* Used to format New Recipe and Result headers */
+#grid-header {
+        -fx-font-size: 16px;
+        -fx-alignment: CENTER;
+        -fx-font-family: "Arial Black";
+        -fx-font-style: italic;
+        -fx-fill: linear-gradient(#CCCCCC, #33ccff);
+        -fx-effect: innershadow( three-pass-box, rgba(0,0,0,0.7) , 6, 0.0 , 0 , 2);
+        -fx-effect: dropshadow( three-pass-box, #000000, 10, 0.5, 0, 2 );
+    }
+/* Used to format anchors */
+#left-anchor {
+    -fx-opacity: 0.7;
+    -fx-background-color: gray;
+    -fx-padding: 10px 10px 20px 10px;
+    }
+#right-anchor {
+    -fx-opacity: 0.7;
+    -fx-background-color: gray;
+    -fx-padding: 10px;
+    }
+/* Used to format output text */
+#output {
+    -fx-font-size: 12px;
+    -fx-font-family: Arial;
+    fx-font-weight: 500;
+    -fx-fill:#000000;
+    }
+/* Used to format grams output - larger than regular output */
+#output-grams {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-font-family: Arial;
+    -fx-fill:#000000;
+        }
