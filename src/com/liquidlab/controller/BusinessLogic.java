@@ -8,6 +8,7 @@ package com.liquidlab.controller;
 import com.liquidlab.Flavor;
 import com.liquidlab.model.DatabaseInteraction;
 import com.liquidlab.view.UserInterface;
+
 import java.text.DecimalFormat;
 
 public class BusinessLogic {
@@ -270,20 +271,59 @@ public class BusinessLogic {
         }
 
         j = 0;
-
-        for(int i = 0; i < results.length; i += 3) {
-            if(!results[i + 1].isEmpty()) {
-                UserInterface.getFlavors()[j].getVenField().setText(results[i + 1]);
+        if(results.length > 1) {
+            for (int i = 0; i < results.length; i += 3) {
+                if(UserInterface.getFlavors()[j] == null)
+                {
+                    UserInterface.addFlavButtonAction();
+                }
+                if (!results[i + 1].isEmpty()) {
+                    UserInterface.getFlavors()[j].getVenField().setText(results[i + 1]);
+                }
+                UserInterface.getFlavors()[j].getFlavField().setText(results[i + 2]);
+                UserInterface.getFlavors()[j].getFlavPerField().setText(results[i]);
+                ++j;
             }
+        }
+    }
 
-            UserInterface.getFlavors()[j].getFlavField().setText(results[i + 2]);
-            UserInterface.getFlavors()[j].getFlavPerField().setText(results[i]);
-            ++j;
+    public static void save()
+    {
+        //Declare local variable
+        boolean alreadyInDb;
+        String recipe = UserInterface.getRecipeName().getText();
+
+        //Initialize local variable
+        alreadyInDb = false;
+
+        //Quick error check - cannot add recipe to database without a name
+        if(recipe.isEmpty())
+        {
+            UserInterface.msgBox("ERROR", 9);
+        }
+        else { //if a valid recipe name was provided
+            DatabaseInteraction.selectFlavor("*"); //grab all recipes from the database
+            String flavorData = combineFlavorData(); //Compile flavor information into String
+            if (!flavorData.equals("error")) {
+                for (int i = 0; i < DatabaseInteraction.getResults().size(); i += 3) { //
+                    if (DatabaseInteraction.getResults().get(i).equals(recipe)) {
+                        DatabaseInteraction.updateFlavor(recipe, flavorData, UserInterface.getNotes().getText());
+                        UserInterface.getComboBox().setCellFactory(param -> UserInterface.dbFlavorHover());
+                        alreadyInDb = true;
+                        UserInterface.msgBox("INFO", 0);
+                    }
+                }
+
+                if (!alreadyInDb) {
+                    DatabaseInteraction.insertFlavor(recipe, flavorData, UserInterface.getNotes().getText());
+                    UserInterface.msgBox("INFO", 1);
+                    UserInterface.getComboBox().getItems().add(recipe);
+                }
+            }
         }
 
     }
-
-    public static String combineFlavorData() {
+    private static String combineFlavorData() {
         String flListToAdd = "";
 
         for(int i = 0; i < UserInterface.getFlavors().length; ++i) {
@@ -296,7 +336,7 @@ public class BusinessLogic {
                     flavor = "," + UserInterface.getFlavors()[i].getFlavField().getText();
                 }
 
-                if(flavor.isEmpty() && !percent.isEmpty()) {
+                if((flavor.isEmpty() || flavor.endsWith(",")) && !percent.isEmpty()) {
                     UserInterface.msgBox("ERROR", 8);
                     flListToAdd = "error";
                     break;
@@ -320,6 +360,7 @@ public class BusinessLogic {
 
         return flListToAdd;
     }
+
 
     private static void calcBaseGrams() {
         setNicBasePg(getNicBasePg() / 100.0);

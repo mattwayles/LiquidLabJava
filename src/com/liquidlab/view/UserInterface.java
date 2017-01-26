@@ -1,13 +1,9 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by Fernflower decompiler)
-//
-
 package com.liquidlab.view;
 
 import com.liquidlab.controller.BusinessLogic;
 import com.liquidlab.model.DatabaseInteraction;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -22,474 +18,89 @@ import javafx.scene.layout.*;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
+/**
+ * UserInterface.java
+ * Author: Matt Wayles
+ * Created: 19 DEC 2016
+ * Modified: 26 JAN 2017
+ *
+ * This class creates and initializes the LiquidLab User Interface. It uses a BorderPane base with a menu populating the top pane and
+ * two GridPanes populating the left and right border panes. The left GridPane provides a ComboBox displaying saved flavors retrieved
+ * from the database, as well as TextFields for user inputs on a new recipe. The right GridPane displays calculation results in ML,
+ * grams, and percentages.
+ */
+
 public class UserInterface extends Application {
-    private static Text ourProduct;
-    private static BorderPane ourPane;
-    private static GridPane ourInput;
-    private static GridPane ourOutput;
-    private static TextField ourMlToMake;
-    private static TextField ourNic;
-    private static TextField ourPg;
-    private static TextField ourVg;
-    private static TextField ourRecipeName;
-    private static Double ourPgMl;
-    private static Double ourVgMl;
-    private static Double ourNicMl;
+    //region Static Class Variables
     private static Double ourPgG;
     private static Double ourVgG;
     private static Double ourNicG;
-    private static TextArea ourNotes;
+    private static Double ourPgMl;
+    private static Double ourVgMl;
+    private static Double ourNicMl;
     private static Double ourPgPer;
     private static Double ourVgPer;
     private static Double ourNicPer;
     private static Integer ourRows;
+    private static Text ourProduct;
+    private static TextField ourPg;
+    private static TextField ourVg;
+    private static TextField ourNic;
+    private static TextField ourMlToMake;
+    private static TextField ourRecipeName;
+    private static TextArea ourNotes;
+    private static GridPane ourInput;
+    private static GridPane ourOutput;
+    private static BorderPane ourPane;
+    private static Button ourAddFlav;
     private static FlavorView[] ourFlavors;
     private static ComboBox<String> ourFlList;
+    //endregion
 
-    public UserInterface() {
-    }
-
+    //region Initiation Methods
+    /**
+     * Main method to launch the User Interface.
+     * @param args  Arguments sent to the GUI launcher
+     */
     public static void main(String[] args) {
         launch(args);
     }
 
+    /**
+     * Start method for the User Interface
+     * @param primaryStage  The main GUI window that opens on execution
+     */
     public void start(Stage primaryStage) {
+        //Declare scene
+        Scene scene;
+
+        //Initialize variables
+        scene = varInit();
+
+        //Populate scene with controls
         primaryStage.setTitle("LiquidLab");
-        setPane(new BorderPane());
-        this.varInit();
-        this.flavorInit();
-        setTopPane(getPane());
-        this.setLeftPane(getPane());
-        setRightPane(getPane());
-        Scene scene = new Scene(getPane(), 1010.0, 530.0);
-        getMlToMake().requestFocus();
-        primaryStage.setScene(scene);
-        scene.getStylesheets().add(UserInterface.class.getResource("Test.css").toExternalForm());
+        setTopPane(primaryStage, getPane());    //BorderPane Top Pane - Menu and Title
+        setLeftPane(getPane()); //BorderPane Left Pane - Recipe Controls
+        setRightPane(getPane());    //Borderpane Right Pane - Calculation Results
+
+        //Format stage and show
+        primaryStage.setScene(scene); //Assign scene to stage
+        scene.getStylesheets().add(UserInterface.class.getResource("Test.css").toExternalForm()); //Apply CSS styling
         primaryStage.show();
-        checkUserInputsTable();
+        getMlToMake().requestFocus(); //Focus on the top-left TextField
     }
 
-    private static MenuBar setMenu() {
-        MenuBar menu = new MenuBar();
-        Menu menuFile = new Menu("File");
-        Menu menuTools = new Menu("Tools");
-        Menu menuAbout = new Menu("About");
-        EventHandler<ActionEvent> setValAction = selectSetValue();
-        MenuItem newWindow = new MenuItem("New");
-        MenuItem saveSettings = new MenuItem("Save");
-        MenuItem importFlav = new MenuItem("Import");
-        MenuItem exportFlav = new MenuItem("Export");
-        MenuItem quit = new MenuItem("Quit");
-        menuFile.getItems().addAll(newWindow, saveSettings, importFlav, exportFlav, quit);
-        MenuItem setWtTool = new MenuItem("Set Weight/Nic Values");
-        setWtTool.setOnAction(setValAction);
-        menuTools.getItems().addAll(setWtTool);
-        MenuItem aboutProduct = new MenuItem("About LiquidLab");
-        MenuItem aboutDiy = new MenuItem("About DIY Mixing");
-        menuAbout.getItems().addAll(aboutProduct, aboutDiy);
-        menu.getMenus().addAll(menuFile, menuTools, menuAbout);
-        return menu;
-    }
+    /**
+     * Initialize variables on launch
+     * @return  the new Scene to assign to the Stage
+     */
+    private Scene varInit() {
+        Scene scene;
+        setPane(new BorderPane());
+        setFlavors(new FlavorView[11]);
+        scene = new Scene(getPane(), 1010.0, 530.0);
 
-    private static EventHandler<ActionEvent> selectSetValue() {
-        return (actionEvent) -> new ValueWindow();
-    }
-
-    private static Text getProduct() {
-        return ourProduct;
-    }
-
-    private static void setProduct(Text newProd) {
-        ourProduct = newProd;
-    }
-
-    public static TextField getMlToMake() {
-        return ourMlToMake;
-    }
-
-    private static void setMlToMake(TextField txtFld) {
-        ourMlToMake = txtFld;
-    }
-
-    public static TextField getNic() {
-        return ourNic;
-    }
-
-    private static void setNic(TextField txtFld) {
-        ourNic = txtFld;
-    }
-
-    public static TextField getPg() {
-        return ourPg;
-    }
-
-    private static void setPg(TextField txtFld) {
-        ourPg = txtFld;
-    }
-
-    public static TextField getVg() {
-        return ourVg;
-    }
-
-    private static void setVg(TextField txtFld) {
-        ourVg = txtFld;
-    }
-
-    public static TextArea getNotes() {
-        return ourNotes;
-    }
-
-    private static void setNotes(TextArea txtArea) {
-        ourNotes = txtArea;
-    }
-
-    private static GridPane getInput() {
-        return ourInput;
-    }
-
-    private static void setInput(GridPane inputPane) {
-        ourInput = inputPane;
-    }
-
-    private static GridPane getOutput() {
-        return ourOutput;
-    }
-
-    private static void setOutput(GridPane outputPane) {
-        ourOutput = outputPane;
-    }
-
-    private static Double getPgMl() {
-        return ourPgMl;
-    }
-
-    public static void setPgMl(Double txt) {
-        ourPgMl = txt;
-    }
-
-    private static Double getVgMl() {
-        return ourVgMl;
-    }
-
-    public static void setVgMl(Double txt) {
-        ourVgMl = txt;
-    }
-
-    private static Double getNicMl() {
-        return ourNicMl;
-    }
-
-    public static void setNicMl(Double txt) {
-        ourNicMl = txt;
-    }
-
-    private static Double getPgG() {
-        return ourPgG;
-    }
-
-    public static void setPgG(Double txt) {
-        ourPgG = txt;
-    }
-
-    private static Double getVgG() {
-        return ourVgG;
-    }
-
-    public static void setVgG(Double txt) {
-        ourVgG = txt;
-    }
-
-    private static Double getNicG() {
-        return ourNicG;
-    }
-
-    public static void setNicG(Double txt) {
-        ourNicG = txt;
-    }
-
-    private static Double getPgPer() {
-        return ourPgPer;
-    }
-
-    public static void setPgPer(Double txt) {
-        ourPgPer = txt;
-    }
-
-    private static Double getVgPer() {
-        return ourVgPer;
-    }
-
-    public static void setVgPer(Double txt) {
-        ourVgPer = txt;
-    }
-
-    private static Double getNicPer() {
-        return ourNicPer;
-    }
-
-    public static void setNicPer(Double txt) {
-        ourNicPer = txt;
-    }
-
-    public static FlavorView[] getFlavors() {
-        return ourFlavors;
-    }
-
-    private static ComboBox<String> getComboBox() {
-        return ourFlList;
-    }
-
-    private static void setComboBox(ComboBox<String> newBox) {
-        ourFlList = newBox;
-    }
-
-    private static void setFlavors(FlavorView[] flavs) {
-        ourFlavors = flavs;
-    }
-
-    private static BorderPane getPane() {
-        return ourPane;
-    }
-
-    private static void setPane(BorderPane newPane) {
-        ourPane = newPane;
-    }
-
-    public static int getRowCount() {
-        return ourRows;
-    }
-
-    private static void setRowCount(int count) {
-        ourRows = count;
-    }
-
-    private static TextField getRecipeName() {
-        return ourRecipeName;
-    }
-
-    private static void setRecipeName(TextField recName) {
-        ourRecipeName = recName;
-    }
-
-    private static void setTopPane(BorderPane parent) {
-        MenuBar menuBar = setMenu();
-        VBox title = new VBox(10.0);
-        Text titleLbl = new Text("LiquidLab");
-        Insets margin = new Insets(0.0, 0.0, 0.0, 30.0);
-        VBox.setMargin(titleLbl, margin);
-        titleLbl.setId("title-text");
-        title.getChildren().addAll(menuBar, titleLbl);
-        parent.setTop(title);
-    }
-
-    private void setLeftPane(BorderPane parent) {
-        HBox lBox = new HBox(8.0);
-        AnchorPane lAnchor = new AnchorPane();
-        Button saveBtn = new Button("Save");
-        Button calcBtn = new Button("Calculate");
-        Button removeBtn = new Button("Remove");
-        Insets margin = new Insets(20.0, 10.0, 30.0, 30.0);
-        removeBtn.setDisable(true);
-        lBox.getChildren().addAll(removeBtn, saveBtn, calcBtn);
-        setInput(new GridPane());
-        getInput().setId("left-grid");
-        lAnchor.setId("left-anchor");
-        AnchorPane.setBottomAnchor(lBox, 5.0);
-        AnchorPane.setRightAnchor(lBox, 8.0);
-        AnchorPane.setTopAnchor(getInput(), 10.0);
-        AnchorPane.setLeftAnchor(getInput(), 10.0);
-        BorderPane.setMargin(lAnchor, margin);
-        lAnchor.getChildren().addAll(getInput(), lBox);
-        parent.setLeft(lAnchor);
-        this.setLeftControls();
-        getComboBox().setOnAction((event) -> this.dbFlavorSelected(removeBtn));
-        removeBtn.setOnMouseClicked((event) -> this.removeButtonAction());
-        saveBtn.setOnMouseClicked((event) -> this.saveButtonAction());
-        calcBtn.setOnMouseClicked((event) -> this.calcButtonAction());
-        getMlToMake().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::textFieldIntEntered);
-        getNic().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::textFieldDoubleEntered);
-        getPg().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::pgKeyEntered);
-        getVg().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::vgKeyEntered);
-        FlavorView[] flavors = getFlavors();
-
-        for (FlavorView flvw : flavors) {
-            if (flvw != null) {
-                flvw.getFlavPerField().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::textFieldDoubleEntered);
-            }
-        }
-
-    }
-
-    private void setLeftControls() {
-        Label mlToMakeText = new Label("ML To Make:");
-        Label mlToMakeUnit = new Label("ml");
-        Label nicText = new Label("Target Nicotine:");
-        Label nicUnit = new Label("mg");
-        Label pgText = new Label("Target PG:");
-        Label pgUnit = new Label("%");
-        Label vgText = new Label("Target VG:");
-        Label vgUnit = new Label("%");
-        Text newFlav = new Text("Recipe");
-        Button addFlav = new Button("+");
-        Text buffer = new Text();
-
-        int i;
-        for(i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
-            getFlavors()[i].addToLeftGrid(getInput());
-        }
-
-        setComboBox(new ComboBox<>());
-        setMlToMake(new TextField());
-        setNic(new TextField());
-        setPg(new TextField());
-        setVg(new TextField());
-        setNotes(new TextArea());
-        setRecipeName(new TextField());
-        getRecipeName().setPromptText("Recipe Name");
-        getNotes().setPromptText("Notes:");
-        getRecipeName().addEventFilter(KeyEvent.KEY_PRESSED, UserInterface::recipeKeyPressed);
-        getNotes().addEventFilter(KeyEvent.KEY_PRESSED, UserInterface::notesKeyPressed);
-        getComboBox().setPromptText("Select Flavor...");
-        DatabaseInteraction.selectFlavor("*");
-
-        for(i = 0; i < DatabaseInteraction.getResults().size(); i += 3) {
-            getComboBox().getItems().add(DatabaseInteraction.getResults().get(i));
-        }
-
-        getInput().add(getComboBox(), 0, 0, 3, 1);
-        formatTextField(getMlToMake(), 4);
-        getInput().add(mlToMakeText, 0, 1);
-        getInput().add(getMlToMake(), 1, 1);
-        getInput().add(mlToMakeUnit, 2, 1);
-        formatTextField(getNic(), 3);
-        getInput().add(nicText, 0, 2);
-        getInput().add(getNic(), 1, 2);
-        getInput().add(nicUnit, 2, 2);
-        formatTextField(getPg(), 3);
-        getInput().add(pgText, 0, 3);
-        getInput().add(getPg(), 1, 3);
-        getInput().add(pgUnit, 2, 3);
-        formatTextField(getVg(), 3);
-        getInput().add(vgText, 0, 4);
-        getInput().add(getVg(), 1, 4);
-        getInput().add(vgUnit, 2, 4);
-        getInput().add(buffer, 0, 5);
-        buffer.setId("buffer-text");
-        addFlav.setId("add-button");
-        newFlav.setId("grid-header");
-        getRecipeName().setId("text-field-recipe");
-        GridPane.setHalignment(newFlav, HPos.CENTER);
-        GridPane.setValignment(newFlav, VPos.TOP);
-        getInput().add(getNotes(), 0, 6, 3, 6);
-        getInput().add(newFlav, 6, 0);
-        getInput().add(getRecipeName(), 5, 1, 3, 1);
-        getInput().add(addFlav, 5, 5);
-        addFlav.setOnMouseClicked((event) -> addFlavButtonAction(addFlav));
-    }
-
-    private void dbFlavorSelected(Button removeBtn) {
-        for(int selectedFlav = 0; selectedFlav < getFlavors().length; ++selectedFlav) {
-            if(getFlavors()[selectedFlav] != null) {
-                getFlavors()[selectedFlav].getVenField().setText("");
-                getFlavors()[selectedFlav].getFlavField().setText("");
-                getFlavors()[selectedFlav].getFlavPerField().setText("");
-            }
-        }
-
-        String selectedFlavor = getComboBox().getSelectionModel().getSelectedItem();
-        getRecipeName().setText(selectedFlavor);
-        BusinessLogic.parseData(selectedFlavor);
-        removeBtn.setDisable(false);
-    }
-
-    private static void setRightPane(BorderPane parent) {
-        AnchorPane rAnchor = new AnchorPane();
-        setOutput(new GridPane());
-        Insets margin = new Insets(20.0, 30.0, 30.0, 0.0);
-        ColumnConstraints col1 = new ColumnConstraints(120.0);
-        ColumnConstraints col2 = new ColumnConstraints(30.0);
-        ColumnConstraints col3 = new ColumnConstraints(40.0);
-        ColumnConstraints col4 = new ColumnConstraints(60.0);
-        getOutput().setId("right-grid");
-        rAnchor.setId("right-anchor");
-        getOutput().getColumnConstraints().addAll(col1, col2, col3, col4);
-
-        for(int i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
-            if(!getFlavors()[i].getFlavPerField().getText().isEmpty() && !getFlavors()[i].getFlavField().getText().isEmpty()) {
-                getFlavors()[i].setFlavPercent(Double.parseDouble(getFlavors()[i].getFlavPerField().getText()));
-                getFlavors()[i].addToRightGrid(getOutput());
-            }
-        }
-
-        rAnchor.getChildren().add(getOutput());
-        BorderPane.setMargin(rAnchor, margin);
-        AnchorPane.setTopAnchor(getOutput(), 10.0);
-        AnchorPane.setLeftAnchor(getOutput(), 10.0);
-        parent.setRight(rAnchor);
-        setRightControls(getOutput());
-    }
-
-    private static void setRightControls(GridPane thisPane) {
-        Label mlLabel = new Label("ml");
-        Label gLabel = new Label("grams");
-        Label perLabel = new Label("% of Total");
-        Label pgLabel = new Label("PG");
-        Label vgLabel = new Label("VG");
-        Label nicLabel = new Label("Nicotine");
-        Text pgMlText = new Text(getPgMl().toString());
-        Text vgMlText = new Text(getVgMl().toString());
-        Text nicMlText = new Text(getNicMl().toString());
-        Text pgGText = new Text(getPgG().toString());
-        Text vgGText = new Text(getVgG().toString());
-        Text nicGText = new Text(getNicG().toString());
-        Text pgPercentText = new Text(getPgPer().toString() + "%");
-        Text vgPercentText = new Text(getVgPer().toString() + "%");
-        Text nicPercentText = new Text(getNicPer().toString() + "%");
-        getProduct().setId("grid-header");
-        thisPane.add(getProduct(), 0, 0, 5, 1);
-        GridPane.setHalignment(getProduct(), HPos.CENTER);
-        thisPane.add(mlLabel, 1, 1);
-        GridPane.setHalignment(mlLabel, HPos.CENTER);
-        thisPane.add(gLabel, 2, 1);
-        GridPane.setHalignment(gLabel, HPos.CENTER);
-        thisPane.add(perLabel, 3, 1);
-        GridPane.setHalignment(perLabel, HPos.CENTER);
-        thisPane.add(pgLabel, 0, 2);
-        GridPane.setHalignment(pgLabel, HPos.RIGHT);
-        thisPane.add(vgLabel, 0, 3);
-        GridPane.setHalignment(vgLabel, HPos.RIGHT);
-        thisPane.add(nicLabel, 0, 4);
-        GridPane.setHalignment(nicLabel, HPos.RIGHT);
-        pgMlText.setId("output");
-        vgMlText.setId("output");
-        nicMlText.setId("output");
-        pgGText.setId("output-grams");
-        vgGText.setId("output-grams");
-        nicGText.setId("output-grams");
-        pgPercentText.setId("output");
-        vgPercentText.setId("output");
-        nicPercentText.setId("output");
-        thisPane.add(pgMlText, 1, 2);
-        GridPane.setHalignment(pgMlText, HPos.CENTER);
-        thisPane.add(vgMlText, 1, 3);
-        GridPane.setHalignment(vgMlText, HPos.CENTER);
-        thisPane.add(nicMlText, 1, 4);
-        GridPane.setHalignment(nicMlText, HPos.CENTER);
-        thisPane.add(pgGText, 2, 2);
-        GridPane.setHalignment(pgGText, HPos.CENTER);
-        thisPane.add(vgGText, 2, 3);
-        GridPane.setHalignment(vgGText, HPos.CENTER);
-        thisPane.add(nicGText, 2, 4);
-        GridPane.setHalignment(nicGText, HPos.CENTER);
-        thisPane.add(pgPercentText, 3, 2);
-        GridPane.setHalignment(pgPercentText, HPos.CENTER);
-        thisPane.add(vgPercentText, 3, 3);
-        GridPane.setHalignment(vgPercentText, HPos.CENTER);
-        thisPane.add(nicPercentText, 3, 4);
-        GridPane.setHalignment(nicPercentText, HPos.CENTER);
-    }
-
-    private void varInit() {
+        //Initialize variables to avoid NullpointerExceptions
         setPgMl(0.0);
         setVgMl(0.0);
         setNicMl(0.0);
@@ -499,29 +110,427 @@ public class UserInterface extends Application {
         setPgPer(0.0);
         setVgPer(0.0);
         setNicPer(0.0);
-        setRowCount(5);
+        setRowCount(5); //Row count begins at 5 because of Recipe Label, Recipe name, and flavor controls
         setProduct(new Text("Results"));
-    }
 
-    private void flavorInit() {
-        setFlavors(new FlavorView[11]);
-
+        //Initialize first 3 left FlavorViews
         for(int i = 0; i < 3; ++i) {
             getFlavors()[i] = new FlavorView();
         }
 
+        return scene;
+    }
+    //endregion
+
+    //region Control Set Methods
+    /**
+     * Method to create and instantiate the menubar at the top-left corner of the stage.
+     * @param stage The initial GUI window the opens on execution.
+     * @return The completed menu control.
+     */
+    private static MenuBar setMenu(Stage stage) {
+        //Declare local variables
+        MenuBar menu;
+        Menu menuFile;
+        Menu menuTools;
+        Menu menuAbout;
+        MenuItem quit;
+        MenuItem newWindow;
+        MenuItem setWtTool;
+        MenuItem saveSettings;
+        MenuItem aboutProduct;
+        EventHandler<ActionEvent> setValAction;
+        EventHandler<ActionEvent> setQuitAction;
+        EventHandler<ActionEvent> setAboutLlAction;
+
+        //Initialize local variables
+        menu = new MenuBar();
+        menuFile = new Menu("File");
+        menuTools = new Menu("Tools");
+        menuAbout = new Menu("About");
+        quit = new MenuItem("Quit");
+        newWindow = new MenuItem("New");
+        saveSettings = new MenuItem("Save");
+        aboutProduct = new MenuItem("About LiquidLab");
+        setWtTool = new MenuItem("Set Weight/Nic Values");
+        setValAction = selectSetValue();
+        setQuitAction = selectQuit();
+        setAboutLlAction = selectAboutLl();
+
+        //Add all menu items to menu
+        menuFile.getItems().addAll(newWindow, saveSettings, quit);
+        menuTools.getItems().addAll(setWtTool);
+        menuAbout.getItems().addAll(aboutProduct);
+        menu.getMenus().addAll(menuFile, menuTools, menuAbout);
+
+        //Set event handlers for selecting items
+        newWindow.setOnAction((event) -> selectNewWindow(stage));
+        saveSettings.setOnAction((event) -> saveButtonAction());
+        quit.setOnAction(setQuitAction);
+        setWtTool.setOnAction(setValAction);
+        aboutProduct.setOnAction(setAboutLlAction);
+
+        return menu;
     }
 
+    /**
+     * Formats and populates the top pane of the BorderPane
+     * @param stage The GUI window
+     * @param parent The base BorderPane
+     */
+    private static void setTopPane(Stage stage, BorderPane parent) {
+        //Declare top controls
+        VBox title;
+        Text titleLbl;
+        Insets margin;
+        MenuBar menuBar;
+
+        //Initialize top controls
+        menuBar = setMenu(stage);
+        title = new VBox(10.0);
+        titleLbl = new Text("LiquidLab");
+        margin = new Insets(0.0, 0.0, 0.0, 30.0);
+
+        //Add top controls
+        VBox.setMargin(titleLbl, margin);
+        title.getChildren().addAll(menuBar, titleLbl);
+        parent.setTop(title);
+
+        //Set CSS Styling
+        titleLbl.setId("title-text");
+    }
+
+    /**
+     * Formats and populates the left pane of the BorderPane
+     * @param parent    The base BorderPane
+     */
+    private static void setLeftPane(BorderPane parent) {
+        //Declare left pane members
+        HBox lBox;
+        AnchorPane lAnchor;
+        Button saveBtn;
+        Button calcBtn;
+        Button removeBtn;
+        Insets margin;
+
+        //Initialize left pane members
+        setInput(new GridPane());
+        lBox= new HBox(8.0);
+        lAnchor = new AnchorPane();
+        saveBtn = new Button("Save");
+        calcBtn = new Button("Calculate");
+        removeBtn = new Button("Remove");
+        margin = new Insets(20.0, 10.0, 30.0, 30.0);
+
+        //Add buttons to horizontal box
+        lBox.getChildren().addAll(removeBtn, saveBtn, calcBtn);
+        removeBtn.setDisable(true);
+
+        //Set CSS Styling
+        getInput().setId("left-grid");
+        lAnchor.setId("left-anchor");
+
+        //Format and populate the AnchorPane
+        AnchorPane.setBottomAnchor(lBox, 5.0);
+        AnchorPane.setRightAnchor(lBox, 8.0);
+        AnchorPane.setTopAnchor(getInput(), 10.0);
+        AnchorPane.setLeftAnchor(getInput(), 10.0);
+        BorderPane.setMargin(lAnchor, margin);
+        lAnchor.getChildren().addAll(getInput(), lBox);
+        parent.setLeft(lAnchor);
+
+        //Set textfields, textareas, and labels
+        setLeftControls();
+
+        //Set event handlers for ComboBox and buttons
+        removeBtn.setOnMouseClicked((event) -> removeButtonAction());
+        saveBtn.setOnMouseClicked((event) -> saveButtonAction());
+        calcBtn.setOnMouseClicked((event) -> calcButtonAction());
+        getComboBox().setOnAction((event) -> dbFlavorSelected(removeBtn));
+    }
+
+    /**
+     * Method to set the smaller controls in the left pane - TextFields, TextAreas, Text, Labels, ComboBox
+     */
+    private static void setLeftControls() {
+        //Declare controls
+        Text buffer;
+        Text newFlav;
+        Label vgUnit;
+        Label vgText;
+        Label pgUnit;
+        Label pgText;
+        Label nicText;
+        Label nicUnit;
+        Label mlToMakeUnit;
+        Label mlToMakeText;
+        FlavorView[] flavors;
+
+        //Initialize controls
+        buffer = new Text();
+        newFlav = new Text("Recipe");
+        pgUnit = new Label("%");
+        vgUnit = new Label("%");
+        pgText = new Label("Target PG:");
+        vgText = new Label("Target VG:");
+        nicUnit = new Label("mg");
+        nicText = new Label("Target Nicotine:");
+        mlToMakeUnit = new Label("ml");
+        mlToMakeText = new Label("ML To Make:");
+        flavors = getFlavors();
+        setAddFlavBtn(new Button("+"));
+        setComboBox(new ComboBox<>());
+        setMlToMake(new TextField());
+        setNic(new TextField());
+        setPg(new TextField());
+        setVg(new TextField());
+        setNotes(new TextArea());
+        setRecipeName(new TextField());
+
+        //Insert controls into the left pane
+        int i;
+        for(i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
+            getFlavors()[i].addToLeftGrid(getInput());
+        }
+        getInput().add(getComboBox(), 0, 0, 3, 1);
+        getInput().add(mlToMakeText, 0, 1);
+        getInput().add(getMlToMake(), 1, 1);
+        getInput().add(mlToMakeUnit, 2, 1);
+        getInput().add(nicText, 0, 2);
+        getInput().add(getNic(), 1, 2);
+        getInput().add(nicUnit, 2, 2);
+        getInput().add(pgText, 0, 3);
+        getInput().add(getPg(), 1, 3);
+        getInput().add(pgUnit, 2, 3);
+        getInput().add(vgText, 0, 4);
+        getInput().add(getVg(), 1, 4);
+        getInput().add(vgUnit, 2, 4);
+        getInput().add(buffer, 0, 5);
+        getInput().add(getNotes(), 0, 6, 3, 6);
+        getInput().add(newFlav, 6, 0);
+        getInput().add(getRecipeName(), 5, 1, 3, 1);
+        getInput().add(getAddFlavBtn(), 5, 5);
+
+        //Format certain controls for max string length
+        formatTextField(getVg(), 3);
+        formatTextField(getPg(), 3);
+        formatTextField(getNic(), 3);
+        formatTextField(getMlToMake(), 4);
+
+        //Apply CSS Styling and alignment
+        buffer.setId("buffer-text");
+        getAddFlavBtn().setId("add-button");
+        newFlav.setId("grid-header");
+        getRecipeName().setId("text-field-recipe");
+        GridPane.setHalignment(newFlav, HPos.CENTER);
+        GridPane.setValignment(newFlav, VPos.TOP);
+
+        //Set control prompt text
+        getNotes().setPromptText("Notes:");
+        getRecipeName().setPromptText("Recipe Name");
+        getComboBox().setPromptText("Select Flavor...");
+
+        //Populate ComboBox from Database
+        DatabaseInteraction.selectFlavor("*");
+        for(i = 0; i < DatabaseInteraction.getResults().size(); i += 3) {
+            getComboBox().getItems().add(DatabaseInteraction.getResults().get(i));
+        }
+
+        //Add event listeners to certain controls
+        getComboBox().setOnMouseEntered((event) -> dbFlavorHover());
+        getComboBox().setCellFactory(param -> dbFlavorHover());
+        getAddFlavBtn().setOnMouseClicked((event) -> addFlavButtonAction());
+        getMlToMake().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::textFieldIntEntered);
+        getNic().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::textFieldDoubleEntered);
+        getPg().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::pgKeyEntered);
+        getVg().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::vgKeyEntered);
+        getRecipeName().addEventFilter(KeyEvent.KEY_PRESSED, UserInterface::recipeKeyPressed);
+        getNotes().addEventFilter(KeyEvent.KEY_PRESSED, UserInterface::notesKeyPressed);
+        for (FlavorView flvw : flavors) {
+            if (flvw != null) {
+                flvw.getFlavPerField().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::textFieldDoubleEntered);
+            }
+        }
+    }
+
+    /**
+     * Method to format and populate the left pane of the BorderPane
+     * @param parent The base BorderPane
+     */
+    private static void setRightPane(BorderPane parent) {
+        //Declare right pane members
+        Insets margin;
+        AnchorPane rAnchor;
+        ColumnConstraints col1;
+        ColumnConstraints col2;
+        ColumnConstraints col3;
+        ColumnConstraints col4;
+
+        //Initialize right pane members
+        rAnchor = new AnchorPane();
+        setOutput(new GridPane());
+        margin = new Insets(20.0, 30.0, 30.0, 0.0);
+        col1 = new ColumnConstraints(120.0);
+        col2 = new ColumnConstraints(30.0);
+        col3 = new ColumnConstraints(40.0);
+        col4 = new ColumnConstraints(60.0);
+
+        //Populate pane
+        BorderPane.setMargin(rAnchor, margin);
+        AnchorPane.setTopAnchor(getOutput(), 10.0);
+        AnchorPane.setLeftAnchor(getOutput(), 10.0);
+        getOutput().getColumnConstraints().addAll(col1, col2, col3, col4);
+        rAnchor.getChildren().add(getOutput());
+        parent.setRight(rAnchor);
+        setRightControls(getOutput());
+
+        //Set CSS Styling
+        getOutput().setId("right-grid");
+        rAnchor.setId("right-anchor");
+
+        //If any flavor fields are populated, display their calculations in this pane
+        for(int i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
+            if(!getFlavors()[i].getFlavPerField().getText().isEmpty()) {
+                getFlavors()[i].setFlavPercent(Double.parseDouble(getFlavors()[i].getFlavPerField().getText()));
+                getFlavors()[i].addToRightGrid(getOutput());
+            }
+        }
+        //Check to see if Nic/Weight data has been assigned by the user
+        checkUserInputsTable();
+    }
+
+    /**
+     * Method to set the smaller controls in the right pane - TextFields, Text, Labels
+     * @param thisPane  The GridPane to add controls on
+     */
+    private static void setRightControls(GridPane thisPane) {
+        //Declare local controls
+        Label mlLabel;
+        Label gLabel;
+        Label perLabel;
+        Label pgLabel;
+        Label vgLabel;
+        Label nicLabel;
+        Text pgMlText;
+        Text vgMlText;
+        Text nicMlText;
+        Text pgGText;
+        Text vgGText;
+        Text nicGText;
+        Text pgPercentText;
+        Text vgPercentText;
+        Text nicPercentText;
+
+        //Initialize local controls
+        mlLabel = new Label("ml");
+        gLabel = new Label("grams");
+        perLabel = new Label("% of Total");
+        pgLabel = new Label("PG");
+        vgLabel = new Label("VG");
+        nicLabel = new Label("Nicotine");
+        pgMlText = new Text(getPgMl().toString());
+        vgMlText = new Text(getVgMl().toString());
+        nicMlText = new Text(getNicMl().toString());
+        pgGText = new Text(getPgG().toString());
+        vgGText = new Text(getVgG().toString());
+        nicGText = new Text(getNicG().toString());
+        pgPercentText = new Text(getPgPer().toString() + "%");
+        vgPercentText = new Text(getVgPer().toString() + "%");
+        nicPercentText = new Text(getNicPer().toString() + "%");
+
+        //Add local controls
+        thisPane.add(getProduct(), 0, 0, 5, 1);
+        thisPane.add(mlLabel, 1, 1);
+        thisPane.add(gLabel, 2, 1);
+        thisPane.add(perLabel, 3, 1);
+        thisPane.add(pgLabel, 0, 2);
+        thisPane.add(vgLabel, 0, 3);
+        thisPane.add(nicLabel, 0, 4);
+        thisPane.add(pgMlText, 1, 2);
+        thisPane.add(vgMlText, 1, 3);
+        thisPane.add(nicMlText, 1, 4);
+        thisPane.add(pgGText, 2, 2);
+        thisPane.add(vgGText, 2, 3);
+        thisPane.add(nicGText, 2, 4);
+        thisPane.add(pgPercentText, 3, 2);
+        thisPane.add(vgPercentText, 3, 3);
+        thisPane.add(nicPercentText, 3, 4);
+
+        //Set control alignment
+        GridPane.setHalignment(getProduct(), HPos.CENTER);
+        GridPane.setHalignment(mlLabel, HPos.CENTER);
+        GridPane.setHalignment(gLabel, HPos.CENTER);
+        GridPane.setHalignment(perLabel, HPos.CENTER);
+        GridPane.setHalignment(pgLabel, HPos.RIGHT);
+        GridPane.setHalignment(vgLabel, HPos.RIGHT);
+        GridPane.setHalignment(nicLabel, HPos.RIGHT);
+        GridPane.setHalignment(pgMlText, HPos.CENTER);
+        GridPane.setHalignment(vgMlText, HPos.CENTER);
+        GridPane.setHalignment(nicMlText, HPos.CENTER);
+        GridPane.setHalignment(pgGText, HPos.CENTER);
+        GridPane.setHalignment(vgGText, HPos.CENTER);
+        GridPane.setHalignment(nicGText, HPos.CENTER);
+        GridPane.setHalignment(pgPercentText, HPos.CENTER);
+        GridPane.setHalignment(vgPercentText, HPos.CENTER);
+        GridPane.setHalignment(nicPercentText, HPos.CENTER);
+
+        //Set CSS Styling
+        getProduct().setId("grid-header");
+        pgMlText.setId("output");
+        vgMlText.setId("output");
+        nicMlText.setId("output");
+        pgGText.setId("output-grams");
+        vgGText.setId("output-grams");
+        nicGText.setId("output-grams");
+        pgPercentText.setId("output");
+        vgPercentText.setId("output");
+        nicPercentText.setId("output");
+
+
+    }
+    //endregion
+
+    //region Functional Methods
+    /**
+     * Method to create a new window and discard the old one when user selects File > New menu item.
+     * @param stage New GUI window with fresh controls.
+     */
+    private static void selectNewWindow(Stage stage) {
+        //Declare new window
+        Stage primaryStage;
+
+        //Initialize new window
+        primaryStage = new Stage();
+
+        //Reset class variables
+        FlavorView.setLrow(2);
+        FlavorView.setRrow(5);
+
+        //Close old window and open new one
+        stage.close();
+        new UserInterface().start(primaryStage);
+    }
+
+    /**
+     * Checks for Nic/Weight data supplied by the user. If it is not supplied, a window is summoned
+     * that will not close until the values are provided.
+     */
     private static void checkUserInputsTable() {
+        //Check if the values exist
         DatabaseInteraction.queryForValues();
-        if(DatabaseInteraction.getResults().isEmpty()) {
-            new ValueWindow();
-        } else {
-            BusinessLogic.getUserValues();
+        if(DatabaseInteraction.getResults().isEmpty()) { //if they don't
+            new ValueWindow();  //open new ValueWindow to request user input
+        } else { //if they do
+            BusinessLogic.getUserValues(); //retrieve them
         }
 
     }
 
+    /**
+     * Method to restrict TextField input values
+     * @param field The TextField to restrict
+     * @param maxLen    The maximum number of inputs allowed
+     */
     static void formatTextField(TextField field, int maxLen) {
         field.setTextFormatter(new TextFormatter<>((change) -> {
             String newText = change.getControlNewText();
@@ -529,58 +538,16 @@ public class UserInterface extends Application {
         }));
     }
 
+    /**
+     * Public method to update the right pane after calculation
+     */
     public static void update() {
         setRightPane(getPane());
     }
 
-    private void calcButtonAction() {
-        FlavorView.reset();
-        if(!getRecipeName().getText().isEmpty()) {
-            setProduct(new Text(getRecipeName().getText()));
-        }
-
-        BusinessLogic.calculate();
-    }
-
-    private void saveButtonAction() {
-        boolean alreadyInDb = false;
-        DatabaseInteraction.selectFlavor("*");
-        String flavorData = BusinessLogic.combineFlavorData();
-        if(!flavorData.equals("error")) {
-            for(int i = 0; i < DatabaseInteraction.getResults().size(); i += 3) {
-                if(DatabaseInteraction.getResults().get(i).equals(getRecipeName().getText())) {
-                    DatabaseInteraction.updateFlavor(getRecipeName().getText(), flavorData, getNotes().getText());
-                    alreadyInDb = true;
-                    msgBox("INFO", 0);
-                }
-            }
-
-            if(!alreadyInDb) {
-                DatabaseInteraction.insertFlavor(getRecipeName().getText(), flavorData, getNotes().getText());
-                msgBox("INFO", 1);
-                getComboBox().getItems().add(getRecipeName().getText());
-            }
-        }
-
-    }
-
-    private static void addFlavButtonAction(Button btn) {
-        getInput().getChildren().remove(btn);
-        getFlavors()[2].getFlavPerField().addEventFilter(KeyEvent.KEY_PRESSED, UserInterface::flavPerKeyEntered);
-        getFlavors()[getRowCount() - 2] = new FlavorView();
-        getFlavors()[getRowCount() - 2].getFlavPerField().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::flavPerKeyEntered);
-        getFlavors()[getRowCount() - 2].addToLeftGrid(getInput());
-        if(getRowCount() < 11) {
-            getInput().add(btn, 5, getRowCount() + 1);
-            setRowCount(getRowCount() + 1);
-        }
-
-    }
-
-    private void removeButtonAction() {
-        msgBox("CONFIRM", 0);
-    }
-
+    /**
+     * Error-checking method with pre-set error messages
+     */
     public static void msgBox(String type, int num) {
         Alert alert;
         String str;
@@ -616,6 +583,10 @@ public class UserInterface extends Application {
                         break;
                     case 8:
                         str = "Cannot insert into database unless all \nflavors contain a name.";
+                        break;
+                    case 9:
+                        str = "You must provide a recipe name to save \nto the database.";
+                        break;
                 }
 
                 alert.setContentText(str);
@@ -672,7 +643,137 @@ public class UserInterface extends Application {
         }
 
     }
+    //endregion
 
+    //region Event Handlers
+    /**
+     * Method to handle the user pressing the "Calculate" button
+     */
+    private static void calcButtonAction() {
+        FlavorView.reset();
+        if(!getRecipeName().getText().isEmpty()) { //If a recipe name was supplied,
+            setProduct(new Text(getRecipeName().getText())); //Update the right-pane label
+        }
+        BusinessLogic.calculate();
+    }
+
+    /**
+     * Method to handle the user pressing the "Save" button
+     */
+    private static void saveButtonAction() {
+        BusinessLogic.save();
+    }
+
+    /**
+     * Method to handle the user pressing the "+" button to add another flavor
+     */
+    public static void addFlavButtonAction() {
+        getInput().getChildren().remove(getAddFlavBtn()); //remove the button
+        getFlavors()[getRowCount() - 2] = new FlavorView(); //replace it with new flavor controls
+        getFlavors()[getRowCount() - 2].addToLeftGrid(getInput());
+
+        //Equip new flavor controls with appropriate event handlers
+        getFlavors()[2].getFlavPerField().addEventFilter(KeyEvent.KEY_PRESSED, UserInterface::flavPerKeyEntered);
+        getFlavors()[getRowCount() - 2].getFlavPerField().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::flavPerKeyEntered);
+
+        //Replace the button on the next row
+        if(getRowCount() < 11) {
+            getInput().add(getAddFlavBtn(), 5, getRowCount() + 1);
+            setRowCount(getRowCount() + 1);
+        }
+
+    }
+
+    /**
+     * Method to ask the user to confirm after pressing the "Remove" button
+     */
+    private static void removeButtonAction() {
+        msgBox("CONFIRM", 0);
+    }
+
+    /**
+     * Method to create ToolTip when hovering mouse over ComboBox item
+     * @return  The new cell with updated ToolTip
+     */
+    public static ListCell dbFlavorHover() {
+        Tooltip tt;
+
+        tt = new Tooltip();
+
+        return new ListCell<String>() {
+            @Override
+            public void updateItem(String str, boolean empty) { //Return the updated ListCell item
+                String notes = "";
+                super.updateItem(str, empty); //Update the ListCell
+                if (str != null) {
+                    setText(str);
+                    //Grab Notes column from DB
+                    DatabaseInteraction.selectNotes(str);
+                    if (!DatabaseInteraction.getResults().isEmpty()) {
+                        notes = DatabaseInteraction.getResults().get(0);
+                    }
+                    //Create tooltip containing Notes info
+                    if (!notes.isEmpty()) {
+                        tt.setText(notes);
+                    }
+                    else {
+                        tt.setText(str);    //Populate tooltip with flavor name
+                    }
+                    setTooltip(tt);
+                } else {
+                    setText(null);
+                    setTooltip(null);
+                }
+            }
+        };
+    }
+
+    /**
+     * Method to handle event when user selects a flavor from the ComboBox
+     */
+    private static void dbFlavorSelected(Button removeBtn) {
+        //Clear any potentially populated textfield
+        for(int selectedFlav = 0; selectedFlav < getFlavors().length; ++selectedFlav) {
+            if(getFlavors()[selectedFlav] != null) {
+                getFlavors()[selectedFlav].getVenField().setText("");
+                getFlavors()[selectedFlav].getFlavField().setText("");
+                getFlavors()[selectedFlav].getFlavPerField().setText("");
+            }
+        }
+        //Populate textfields with new flavor information based on selection
+        String selectedFlavor = getComboBox().getSelectionModel().getSelectedItem();
+        getRecipeName().setText(selectedFlavor);
+        BusinessLogic.parseData(selectedFlavor);
+        removeBtn.setDisable(false);
+    }
+
+    /**
+     * Method to create new ValueWindow when user selects NIC/Weight Tool from the Tools menu.
+     * @return  The user's menu selection
+     */
+    private static EventHandler<ActionEvent> selectSetValue() {
+        return (actionEvent) -> new ValueWindow();
+    }
+
+    /**
+     * Method to close the program when the File > Quit option is chosen.
+     * @return The user's menu selection
+     */
+    private static EventHandler<ActionEvent> selectQuit()
+    {
+        return (actionEvent) -> Platform.exit();
+    }
+
+    /**
+     * Method to open "About LiquidLab" window when About > About LiquidLab menu item is chosen.
+     * @return The user's menu selection
+     */
+    private static EventHandler<ActionEvent> selectAboutLl() {return (actionEvent) -> new About(); }
+
+    /**
+     * Event handler for entering an Integer in a textfield (consumes all non-integers)
+     * @param inputEvent    The key being added
+     */
     private static void textFieldIntEntered(KeyEvent inputEvent) {
         if(!inputEvent.getCharacter().matches("\\d")) {
             inputEvent.consume();
@@ -680,6 +781,10 @@ public class UserInterface extends Application {
 
     }
 
+    /**
+     * Event handler for entering a Double in a textfield (consumes all non-integers except ".")
+     * @param inputEvent    The key being entered
+     */
     private static void textFieldDoubleEntered(KeyEvent inputEvent) {
         if(!inputEvent.getCharacter().equals(".") && !inputEvent.getCharacter().matches("\\d")) {
             inputEvent.consume();
@@ -687,29 +792,39 @@ public class UserInterface extends Application {
 
     }
 
+    /**
+     * Event handler for pressing a key within the PG % control. Contains conditions to consume a non-integer and
+     * non-period, accept an integer or period, tab to the appropriate control, accept the delete key, and set
+     * the VG % field to the 100 minus the supplied value.
+     * @param inputEvent    The key being entered
+     */
     private static void pgKeyEntered(KeyEvent inputEvent) {
-        if(!inputEvent.isControlDown() && (inputEvent.getCharacter().equals("\b") || inputEvent.getCharacter().matches("\\d"))) {
+        //Key must be a non-letter and the control key cannot be depressed
+        if((inputEvent.getCharacter().equals("\b") || inputEvent.getCharacter().matches("\\d"))
+                && !inputEvent.isControlDown()) {
             String newText;
-            if(!getPg().getText().isEmpty()) {
-                if(!inputEvent.getCharacter().equals("\b")) {
-                    if(!getPg().getSelectedText().isEmpty()) {
-                        getPg().setText(getPg().getText().replace(getPg().getSelectedText(), ""));
+            if(!getPg().getText().isEmpty()) { //Added to avoid NullPtr when 'delete' is used in empty box
+                if(!inputEvent.getCharacter().equals("\b")) { //If non-backspace was entered
+                    if(!getPg().getSelectedText().isEmpty()) { //If any text is selected
+                        getPg().setText(getPg().getText().replace(getPg().getSelectedText(), "")); //delete selected text
                     }
-
-                    newText = getPg().getText() + inputEvent.getCharacter();
-                } else {
-                    newText = getPg().getText();
+                    newText = getPg().getText() + inputEvent.getCharacter(); //Append the new integer
+                } else { //if delete was used in a populated box
+                    newText = getPg().getText(); //delete the value and set the new text
                 }
-            } else if(inputEvent.getCharacter().equals("\b")) {
-                newText = "0";
-            } else {
-                newText = inputEvent.getCharacter();
+            }
+            else if(inputEvent.getCharacter().equals("\b")) { //if delete is used on empty box
+                newText = "0"; //set text to 0
+            }
+            else { //if non-delete is entered in empty box
+                newText = inputEvent.getCharacter(); //set the new text
             }
 
+            //PG box value successfully set, now set corresponding VG value
             Integer diff = 100 - Integer.parseInt(newText);
-            if(diff >= 0) {
-                getVg().setText(diff.toString());
-            } else {
+            if(diff >= 0) { //if valid value was entered
+                getVg().setText(diff.toString()); //set VG textfield to difference value
+            } else { //if invalid value is entered, pop an error
                 inputEvent.consume();
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setHeaderText("Invalid Input");
@@ -721,35 +836,42 @@ public class UserInterface extends Application {
 
                 });
             }
-        } else {
+        } else { //if a non-integer, non-period, non-backspace is entered, or the control key is depressed
             inputEvent.consume();
         }
 
     }
 
+    /**
+     * Event handler for pressing a key within the VG % control. Contains conditions to consume a non-integer and
+     * non-period, accept an integer or period, tab to the appropriate control, accept the delete key, and set
+     * the PG % field to the 100 minus the supplied value.
+     * @param inputEvent    The key being entered
+     */
     private static void vgKeyEntered(KeyEvent inputEvent) {
+        //Key must be a non-letter and the control key cannot be depressed
         if(!inputEvent.isControlDown() && (inputEvent.getCharacter().equals("\b") || inputEvent.getCharacter().matches("\\d"))) {
             String newText;
-            if(!getVg().getText().isEmpty()) {
-                if(!inputEvent.getCharacter().equals("\b")) {
-                    if(!getVg().getSelectedText().isEmpty()) {
-                        getVg().setText(getVg().getText().replace(getVg().getSelectedText(), ""));
+            if(!getVg().getText().isEmpty()) { //Added to avoid NullPtr when 'delete' is used in empty box
+                if(!inputEvent.getCharacter().equals("\b")) { //If non-backspace was entered
+                    if(!getVg().getSelectedText().isEmpty()) { //If any text is selected
+                        getVg().setText(getVg().getText().replace(getVg().getSelectedText(), "")); //delete selected text
                     }
-
-                    newText = getVg().getText() + inputEvent.getCharacter();
-                } else {
-                    newText = getVg().getText();
+                    newText = getVg().getText() + inputEvent.getCharacter(); //Append the new integer
+                } else { //if delete was used in a populated box
+                    newText = getVg().getText();  //delete the value and set the new text
                 }
-            } else if(inputEvent.getCharacter().equals("\b")) {
-                newText = "0";
-            } else {
-                newText = inputEvent.getCharacter();
+            } else if(inputEvent.getCharacter().equals("\b")) { //if delete is used on empty box
+                newText = "0";  //set text to 0
+            } else {  //if non-delete is entered in empty box
+                newText = inputEvent.getCharacter();  //set the new text
             }
 
+            //VG box value successfully set, now set corresponding PG value
             Integer diff = 100 - Integer.parseInt(newText);
-            if(diff >= 0) {
-                getPg().setText(diff.toString());
-            } else {
+            if(diff >= 0) {  //if valid value was entered
+                getPg().setText(diff.toString());  //set VG textfield to difference value
+            } else {  //if invalid value is entered, pop an error
                 inputEvent.consume();
                 Alert alert = new Alert(AlertType.ERROR);
                 alert.setHeaderText("Invalid Input");
@@ -761,13 +883,18 @@ public class UserInterface extends Application {
 
                 });
             }
-        } else {
+        } else {  //if a non-integer, non-period, non-backspace is entered, or the control key is depressed
             inputEvent.consume();
         }
 
     }
 
+    /**
+     * Event handler for pressing tab within the Notes textarea.
+     * @param inputEvent    The key being entered
+     */
     private static void notesKeyPressed(KeyEvent inputEvent) {
+        //Define control to focus when Tab key is pressed in Notes TextArea
         if(inputEvent.getCode() == KeyCode.TAB) {
             getRecipeName().requestFocus();
             inputEvent.consume();
@@ -775,7 +902,12 @@ public class UserInterface extends Application {
 
     }
 
+    /**
+     * Event handler for pressing tab within the Recipe TextField
+     * @param inputEvent    The key being entered.
+     */
     private static void recipeKeyPressed(KeyEvent inputEvent) {
+        //Define control to focus when Tab key is pressed in Recipe TextArea
         if(inputEvent.getCode() == KeyCode.TAB) {
             getFlavors()[0].getVenField().requestFocus();
             inputEvent.consume();
@@ -783,7 +915,12 @@ public class UserInterface extends Application {
 
     }
 
+    /**
+     * Event handler for pressing tab within the third flavor percent textfield
+     * @param inputEvent    The key being entered.
+     */
     private static void flavPerKeyEntered(KeyEvent inputEvent) {
+        //Define control to focus when Tab key is pressed in Recipe TextArea
         if(inputEvent.getCode() == KeyCode.TAB) {
             if(getFlavors()[3] != null) {
                 getFlavors()[3].getVenField().requestFocus();
@@ -791,10 +928,377 @@ public class UserInterface extends Application {
 
             inputEvent.consume();
         }
-
+        //Throw out any input that is non-numerical, not a period, not Tab, and not backspace
         if(!inputEvent.getCharacter().equals(".") && !inputEvent.getText().equals("\b") && !inputEvent.getCharacter().matches("\\d")) {
             inputEvent.consume();
         }
-
     }
+    //endregion
+
+    //region Getters & Setters
+    /**
+     * Get the calculated Grams of PG required for the recipe
+     * @return  Calculated grams of PG required for the recipe
+     */
+    private static Double getPgG() {
+        return ourPgG;
+    }
+
+    /**
+     * Sets the grams of PG required for the recipe after calculation
+     * @param txt   The grams of PG required for the recipe
+     */
+    public static void setPgG(Double txt) {
+        ourPgG = txt;
+    }
+
+    /**
+     * Get the calculated Grams of VG required for the recipe
+     * @return  Calculated grams of VG required for the recipe
+     */
+    private static Double getVgG() {
+        return ourVgG;
+    }
+
+    /**
+     * Sets the grams of VG required for the recipe after calculation
+     * @param txt   The grams of VG required for the recipe
+     */
+    public static void setVgG(Double txt) {
+        ourVgG = txt;
+    }
+
+    /**
+     * Get the calculated Grams of Nicotine required for the recipe
+     * @return  Calculated grams of Nicotine required for the recipe
+     */
+    private static Double getNicG() {
+        return ourNicG;
+    }
+
+    /**
+     * Sets the grams of Nicotine required for the recipe after calculation
+     * @param txt   The grams of Nicotine required for the recipe
+     */
+    public static void setNicG(Double txt) {
+        ourNicG = txt;
+    }
+
+    /**
+     * Get the calculated Milliliters of PG required for the recipe
+     * @return  Calculated Milliliters of PG required for the recipe
+     */
+    private static Double getPgMl() {
+        return ourPgMl;
+    }
+
+    /**
+     * Sets the milliliters of PG required for the recipe after calculation
+     * @param txt   The milliliters of PG required for the recipe
+     */
+    public static void setPgMl(Double txt) {
+        ourPgMl = txt;
+    }
+
+    /**
+     * Get the calculated Milliliters of VG required for the recipe
+     * @return  Calculated Milliliters of VG required for the recipe
+     */
+    private static Double getVgMl() {
+        return ourVgMl;
+    }
+
+    /**
+     * Sets the milliliters of VG required for the recipe after calculation
+     * @param txt   The milliliters of VG required for the recipe
+     */
+    public static void setVgMl(Double txt) {
+        ourVgMl = txt;
+    }
+
+    /**
+     * Get the calculated Milliliters of Nicotine required for the recipe
+     * @return  Calculated Milliliters of Nicotine required for the recipe
+     */
+    private static Double getNicMl() {
+        return ourNicMl;
+    }
+
+    /**
+     * Sets the milliliters of VG required for the recipe after calculation
+     * @param txt   The milliliters of VG required for the recipel
+     */
+    public static void setNicMl(Double txt) {
+        ourNicMl = txt;
+    }
+
+    /**
+     * Get the calculated percentage of PG required for the recipe
+     * @return  Calculated percentage of PG required for the recipe
+     */
+    private static Double getPgPer() {
+        return ourPgPer;
+    }
+
+    /**
+     * Sets the percentage of PG required for the recipe after calculation
+     * @param txt   The percentage of PG required for the recipel
+     */
+    public static void setPgPer(Double txt) {
+        ourPgPer = txt;
+    }
+
+    /**
+     * Get the calculated percentage of VG required for the recipe
+     * @return  Calculated percentage of VG required for the recipe
+     */
+    private static Double getVgPer() {
+        return ourVgPer;
+    }
+
+    /**
+     * Sets the percentage of VG required for the recipe after calculation
+     * @param txt   The percentage of VG required for the recipel
+     */
+    public static void setVgPer(Double txt) {
+        ourVgPer = txt;
+    }
+
+    /**
+     * Get the calculated percentage of Nicotine required for the recipe
+     * @return  Calculated percentage of Nicotine required for the recipe
+     */
+    private static Double getNicPer() {
+        return ourNicPer;
+    }
+
+    /**
+     * Sets the percentage of Nicotine required for the recipe after calculation
+     * @param txt   The percentage of Nicotine required for the recipel
+     */
+    public static void setNicPer(Double txt) {
+        ourNicPer = txt;
+    }
+
+    /**
+     * Get the GridPane row value to insert controls into the left GridPane
+     * @return  The left GridPane row available for control insertion
+     */
+    public static int getRowCount() {
+        return ourRows;
+    }
+
+    /**
+     * Set the GridPane row value to insert controls into the left GridPane
+     * @param count  The left GridPane row available for control insertion
+     */
+    private static void setRowCount(int count) {
+        ourRows = count;
+    }
+
+    /**
+     * Get the name of the product resulting from the calculation, based on what is supplied
+     * in the "Recipe Name" textbox.
+     * @return  The name of the final product
+     */
+    private static Text getProduct() {
+        return ourProduct;
+    }
+
+    /**
+     * Set the name of the product resulting from the calculation by extracting the value
+     * from the "Recipe Name" textbox.
+     * @param newProd The name of the final product
+     */
+    private static void setProduct(Text newProd) {
+        ourProduct = newProd;
+    }
+
+    /**
+     * Get the user-supplied amount of PG to add to the recipe as a percentage.
+     * @return  The amount of PG to add, as a percentage
+     */
+    public static TextField getPg() {
+        return ourPg;
+    }
+
+    /**
+     * Set the amount of PG to add to the recipe as a percentage.
+     * @param txtFld    The TextField containing the amount of PG to add, as a percentage
+     */
+    private static void setPg(TextField txtFld) {
+        ourPg = txtFld;
+    }
+
+    /**
+     * Get the user-supplied amount of VG to add to the recipe as a percentage.
+     * @return  The amount of VG to add, as a percentage
+     */
+    public static TextField getVg() {
+        return ourVg;
+    }
+
+    /**
+     * Set the amount of VG to add to the recipe as a percentage.
+     * @param txtFld    The TextField containing the amount of VG to add, as a percentage
+     */
+    private static void setVg(TextField txtFld) {
+        ourVg = txtFld;
+    }
+
+    /**
+     * Get the user-supplied amount of nicotine to add to the recipe, in milligrams
+     * @return  The amount of nicotine to add, in milligrams
+     */
+    public static TextField getNic() {
+        return ourNic;
+    }
+
+    /**
+     * Set the amount of nicotine to add to the recipe with user-supplied data
+     * @param txtFld    The TextField containing the amount of nicotine to add, in milligrams
+     */
+    private static void setNic(TextField txtFld) {
+        ourNic = txtFld;
+    }
+    /**
+     * Get the user-supplied volume of liquid to produce
+     * @return  The volume of liquid to make, in millileters
+     */
+    public static TextField getMlToMake() {
+        return ourMlToMake;
+    }
+
+    /**
+     * Set the amount of liquid to make with user-supplied data
+     * @param txtFld    The TextField containing the volume to produce, in millimeters
+     */
+    private static void setMlToMake(TextField txtFld) {
+        ourMlToMake = txtFld;
+    }
+
+    /**
+     * Get the name of the current recipe
+     * @return  The name of the current recipe
+     */
+    public static TextField getRecipeName() {
+        return ourRecipeName;
+    }
+
+    /**
+     * Set the name of the current recipe
+     * @param recName  The name of the current recipe
+     */
+    private static void setRecipeName(TextField recName) {
+        ourRecipeName = recName;
+    }
+
+    /**
+     * Get the Notes associated with a recipe
+     * @return The notes associated with a recipe
+     */
+    public static TextArea getNotes() {
+        return ourNotes;
+    }
+
+    /**
+     * Associate the text in the Notes TextArea with a recipe
+     * @param txtArea The TextArea containing the notes to be associated with the recipe
+     */
+    private static void setNotes(TextArea txtArea) {
+        ourNotes = txtArea;
+    }
+
+    /**
+     * Gets the left (input) GridPane
+     * @return The left (input) GridPane
+     */
+    private static GridPane getInput() {
+        return ourInput;
+    }
+
+    /**
+     * Sets the left (input) GridPane
+     * @param inputPane A GridPane object to be set in the left BorderPane field
+     */
+    private static void setInput(GridPane inputPane) {
+        ourInput = inputPane;
+    }
+
+    /**
+     * Gets the right (output) GridPane
+     * @return The right (output) GridPane
+     */
+    private static GridPane getOutput() {
+        return ourOutput;
+    }
+
+    /**
+     * Sets the right (output) GridPane
+     * @param outputPane A GridPane object to be set in the right BorderPane field
+     */
+    private static void setOutput(GridPane outputPane) {
+        ourOutput = outputPane;
+    }
+
+    /**
+     * Get the base BorderPane that contains GridPane items
+     * @return The base BorderPane
+     */
+    private static BorderPane getPane() {
+        return ourPane;
+    }
+
+    /**
+     * Set the base BorderPane within the scene
+     * @param newPane The base BorderPane
+     */
+    private static void setPane(BorderPane newPane) {
+        ourPane = newPane;
+    }
+
+    /**
+     * Retrieve the button that is used to add flavors to the left grid
+     * @return  The Add Flavors (+) button
+     */
+    private static Button getAddFlavBtn() { return ourAddFlav; }
+
+    /**
+     * Set the button that is used to add flavors to the left grid
+     * @param btn The Add Flavors (+) button
+     */
+    private static void setAddFlavBtn(Button btn) { ourAddFlav = btn; }
+
+    /**
+     * Gets the list of flavors retrieved from the database or supplied by the user
+     * @return A list of Flavor objects
+     */
+    public static FlavorView[] getFlavors() {
+        return ourFlavors;
+    }
+
+    /**
+     * Sets the list of flavors frm either a database query or user input
+     * @param flavs An ArrayList of type Flavor
+     */
+    private static void setFlavors(FlavorView[] flavs) {
+        ourFlavors = flavs;
+    }
+
+    /**
+     * Gets the ComboBox used to select saved flavors
+     * @return The flavor ComboBox
+     */
+    public static ComboBox<String> getComboBox() {
+        return ourFlList;
+    }
+
+    /**
+     * Sets a ComboBox in the GridPane
+     * @param newBox A ComboBox of type String
+     */
+    private static void setComboBox(ComboBox<String> newBox) {
+        ourFlList = newBox;
+    }
+    //endregion
 }
