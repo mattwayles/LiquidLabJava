@@ -16,7 +16,7 @@
 .menu-item:hover {
     -fx-background-color: linear-gradient(#61a2b1, #2a5058);
     }
-/* Used by all labels */
+/*Used by all labels*/
 .text {
     -fx-font-size: 10px;
     -fx-font-weight: bold;
@@ -35,6 +35,10 @@
 .button:hover {
     -fx-background-color: linear-gradient(#2a5058, #61a2b1);
     }
+#strikethrough {
+    -fx-strikethrough: true;
+    -fx-fill: red;
+    }
 #add-button {
     -fx-font-size: 3px;
     -fx-padding: 0 5 0 5;
@@ -44,7 +48,7 @@
     -fx-background-color: linear-gradient(#61a2b1, #2a5058);
     -fx-effect: dropshadow( three-pass-box, rgba(0,0,0,0.6), 5, 0.0, 0 , 1 );
         }
-/* Used by combo box */
+/* Used by combo box*/
 .combo-box .list-cell {
     -fx-pref-width: 165px;
     -fx-background-color: linear-gradient(#61a2b1, #2a5058);
@@ -55,6 +59,13 @@
 .combo-box .arrow {
     -fx-background-color: white;
     }
+.combo-box-popup .list-view .list-cell:hover{
+    -fx-background-color: black;
+    }
+#combo-box-list-cell {
+     -fx-pref-width: 165px;
+     -fx-text-fill: red;
+     }
 /* Used by notes text area */
 .text-area {
     -fx-pref-height: 150px;
@@ -68,6 +79,10 @@
     -fx-alignment: baseline-right;
     -fx-pref-width: 38px;
     -fx-font-size: 9px;
+    -fx-text-fill: #305962;
+    }
+#tbl-textfield {
+    -fx-font-size: 11px;
     -fx-text-fill: #305962;
     }
 #buffer-text {

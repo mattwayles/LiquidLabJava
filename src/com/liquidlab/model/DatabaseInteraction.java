@@ -40,28 +40,68 @@ public class DatabaseInteraction {
     public static void selectFlavor(String flavor) {
         setResults(new ArrayList<>());
         String sqlcmd;
-        if(flavor.equals("*")) {
-            sqlcmd = "SELECT * from flavors";
-        } else {
-            sqlcmd = "SELECT * from flavors WHERE Name = ?";
+        if(flavor != null) {
+            if (flavor.equals("*")) {
+                sqlcmd = "SELECT * from flavors";
+            } else {
+                sqlcmd = "SELECT * from flavors WHERE Name = ?";
+            }
+            try {
+                Connection e = connect();
+                PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+                if (!flavor.equals("*")) {
+                    pstmt.setString(1, flavor);
+                }
+
+                ResultSet rs = pstmt.executeQuery();
+                while (rs.next()) {
+                    getResults().add(rs.getString("Name"));
+                    getResults().add(rs.getString("fl"));
+                    getResults().add(rs.getString("desc"));
+                }
+                e.close();
+            } catch (SQLException ex) {
+                UserInterface.msgBox("ERROR", 5);
+            }
         }
+    }
+
+    public static void selectInventory()
+    {
+        setResults(new ArrayList<>());
+        String sqlcmd = "SELECT * from inventory";
 
         try {
             Connection e = connect();
             PreparedStatement pstmt = e.prepareStatement(sqlcmd);
-            if(!flavor.equals("*")) {
-                pstmt.setString(1, flavor);
-            }
-
             ResultSet rs = pstmt.executeQuery();
-            while(rs.next()) {
-                getResults().add(rs.getString("Name"));
-                getResults().add(rs.getString("fl"));
-                getResults().add(rs.getString("desc"));
+            while (rs.next()) {
+                getResults().add(rs.getString("ven"));
+                getResults().add(rs.getString("name"));
+                getResults().add(rs.getString("amt"));
             }
             e.close();
-        } catch (SQLException ex) {
-            UserInterface.msgBox("ERROR", 5);
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void selectShoppingList()
+    {
+        setResults(new ArrayList<>());
+        String sqlcmd = "SELECT * from shoppinglist";
+
+        try {
+            Connection e = connect();
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            ResultSet rs = pstmt.executeQuery();
+            while (rs.next()) {
+                getResults().add(rs.getString("ven"));
+                getResults().add(rs.getString("name"));
+            }
+            e.close();
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
         }
     }
 
@@ -79,7 +119,9 @@ public class DatabaseInteraction {
                 getResults().add(rs.getString("desc"));
             }
             e.close();
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public static void queryForValues() {
@@ -92,6 +134,75 @@ public class DatabaseInteraction {
             ResultSet rs = pstmt.executeQuery();
             if(!rs.isClosed()) {
                 getResults().add(rs.getString("nicStrength"));
+            }
+            e.close();
+        } catch (SQLException ex) {
+            UserInterface.msgBox("ERROR", 5);
+        }
+
+    }
+
+    public static void queryInventory(String ven, String name) {
+        setResults(new ArrayList<>());
+        String sqlcmd;
+        if (!ven.isEmpty()) {
+            sqlcmd = "SELECT * from inventory WHERE ven = ? AND name = ?";
+        }
+        else
+        {
+            sqlcmd = "SELECT * from inventory WHERE name = ?";
+        }
+
+        try {
+            Connection e = connect();
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            if(!ven.isEmpty()) {
+                pstmt.setString(1, ven);
+                pstmt.setString(2, name);
+            }
+            else
+            {
+                pstmt.setString(1, name);
+            }
+            ResultSet rs = pstmt.executeQuery();
+            if(!rs.isClosed()) {
+                getResults().add(rs.getString("ven"));
+                getResults().add(rs.getString("name"));
+                getResults().add(rs.getString("amt"));
+            }
+            e.close();
+        } catch (SQLException ex) {
+            UserInterface.msgBox("ERROR", 5);
+        }
+
+    }
+
+    public static void queryShoppingList(String ven, String name) {
+        setResults(new ArrayList<>());
+        String sqlcmd;
+        if (!ven.isEmpty()) {
+            sqlcmd = "SELECT * from shoppinglist WHERE ven = ? AND name = ?";
+        }
+        else
+        {
+            sqlcmd = "SELECT * from shoppinglist WHERE name = ?";
+        }
+
+        try {
+            Connection e = connect();
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            if(!ven.isEmpty()) {
+                pstmt.setString(1, ven);
+                pstmt.setString(2, name);
+            }
+            else
+            {
+                pstmt.setString(1, name);
+            }
+            ResultSet rs = pstmt.executeQuery();
+            if(!rs.isClosed()) {
+                getResults().add(rs.getString("ven"));
+                getResults().add(rs.getString("name"));
             }
             e.close();
         } catch (SQLException ex) {
@@ -171,53 +282,51 @@ public class DatabaseInteraction {
             Connection e = connect();
             Throwable var5 = null;
 
-            try {
-                PreparedStatement pstmt = e.prepareStatement(sqlcmd);
-                Throwable var7 = null;
-
-                try {
-                    pstmt.setString(1, name);
-                    pstmt.setString(2, fl);
-                    pstmt.setString(3, desc);
-                    pstmt.executeUpdate();
-                } catch (Throwable var32) {
-                    var7 = var32;
-                    throw var32;
-                } finally {
-                    if(pstmt != null) {
-                        if(var7 != null) {
-                            try {
-                                pstmt.close();
-                            } catch (Throwable var31) {
-                                var7.addSuppressed(var31);
-                            }
-                        } else {
-                            pstmt.close();
-                        }
-                    }
-
-                }
-            } catch (Throwable var34) {
-                var5 = var34;
-                throw var34;
-            } finally {
-                if(e != null) {
-                    if(var5 != null) {
-                        try {
-                            e.close();
-                        } catch (Throwable var30) {
-                            var5.addSuppressed(var30);
-                        }
-                    } else {
-                        e.close();
-                    }
-                }
-
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            pstmt.setString(1, name);
+            pstmt.setString(2, fl);
+            pstmt.setString(3, desc);
+            pstmt.executeUpdate();
+            e.close();
             }
-        } catch (SQLException var36) {
-            System.out.println(var36.getMessage());
-        }
+            catch (SQLException ex) {
+                System.out.println(ex.getMessage());
+            }
+    }
 
+    public static void insertInventory(String ven, String name, String amt) {
+        String sqlcmd = "INSERT INTO inventory(ven, name, amt) VALUES(?,?,?)";
+
+        try {
+            Connection e = connect();
+
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            pstmt.setString(1, ven);
+            pstmt.setString(2, name);
+            pstmt.setString(3, amt);
+            pstmt.executeUpdate();
+            e.close();
+        }
+        catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+
+    public static void insertShoppingList(String ven, String name) {
+        String sqlcmd = "INSERT INTO shoppinglist(ven, name) VALUES(?,?)";
+
+        try {
+            Connection e = connect();
+
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            pstmt.setString(1, ven);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+            e.close();
+        }
+        catch (SQLException ex) {
+            System.out.println(ex.getMessage());
+        }
     }
 
     public static void insertValues(String nicStrength, String nicBasePg, String nicBaseVg, String flavWt, String nicWt, String pgWt, String vgWt) {
@@ -271,6 +380,23 @@ public class DatabaseInteraction {
 
     }
 
+    public static void updateInventory(String ven, String name, String amt) {
+        String sqlcmd = "UPDATE inventory SET amt = ? WHERE ven = ? AND name = ?";
+
+        try {
+            Connection e = connect();
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            pstmt.setString(1, amt);
+            pstmt.setString(2, ven);
+            pstmt.setString(3, name);
+            pstmt.executeUpdate();
+            e.close();
+        } catch (SQLException ex) {
+            UserInterface.msgBox("ERROR", 5);
+        }
+
+    }
+
     public static void deleteFlavor(String name) {
         String sqlcmd;
         if(name.equals("*")) {
@@ -285,7 +411,44 @@ public class DatabaseInteraction {
             if(!name.equals("*")) {
                 pstmt.setString(1, name);
                 pstmt.executeUpdate();
+                e.close();
             }
+        } catch (SQLException ex) {
+            UserInterface.msgBox("ERROR", 5);
+        }
+
+    }
+
+    public static void deleteInventory(String ven, String name) {
+        String sqlcmd;
+
+        sqlcmd = "DELETE from inventory WHERE ven = ? AND name = ?";
+
+        try {
+            Connection e = connect();
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            pstmt.setString(1, ven);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+            e.close();
+        } catch (SQLException ex) {
+            UserInterface.msgBox("ERROR", 5);
+        }
+
+    }
+
+    public static void deleteShoppingList(String ven, String name) {
+        String sqlcmd;
+
+        sqlcmd = "DELETE from shoppinglist WHERE ven = ? AND name = ?";
+
+        try {
+            Connection e = connect();
+            PreparedStatement pstmt = e.prepareStatement(sqlcmd);
+            pstmt.setString(1, ven);
+            pstmt.setString(2, name);
+            pstmt.executeUpdate();
+            e.close();
         } catch (SQLException ex) {
             UserInterface.msgBox("ERROR", 5);
         }

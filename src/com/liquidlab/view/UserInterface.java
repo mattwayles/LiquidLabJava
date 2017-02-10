@@ -4,6 +4,9 @@ import com.liquidlab.controller.BusinessLogic;
 import com.liquidlab.model.DatabaseInteraction;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -15,8 +18,13 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+
+import java.text.Collator;
+import java.util.ArrayList;
 
 /**
  * UserInterface.java
@@ -41,6 +49,7 @@ public class UserInterface extends Application {
     private static Double ourPgPer;
     private static Double ourVgPer;
     private static Double ourNicPer;
+    private static Double ourMlLeft;
     private static Integer ourRows;
     private static Text ourProduct;
     private static TextField ourPg;
@@ -54,13 +63,17 @@ public class UserInterface extends Application {
     private static BorderPane ourPane;
     private static Button ourAddFlav;
     private static FlavorView[] ourFlavors;
+    private static ObservableList<String> cboxItems;
+    private static ArrayList<String[]> flavsNotInInv;
     private static ComboBox<String> ourFlList;
     //endregion
 
     //region Initiation Methods
+
     /**
      * Main method to launch the User Interface.
-     * @param args  Arguments sent to the GUI launcher
+     *
+     * @param args Arguments sent to the GUI launcher
      */
     public static void main(String[] args) {
         launch(args);
@@ -68,7 +81,8 @@ public class UserInterface extends Application {
 
     /**
      * Start method for the User Interface
-     * @param primaryStage  The main GUI window that opens on execution
+     *
+     * @param primaryStage The main GUI window that opens on execution
      */
     public void start(Stage primaryStage) {
         //Declare scene
@@ -92,7 +106,8 @@ public class UserInterface extends Application {
 
     /**
      * Initialize variables on launch
-     * @return  the new Scene to assign to the Stage
+     *
+     * @return the new Scene to assign to the Stage
      */
     private Scene varInit() {
         Scene scene;
@@ -112,9 +127,10 @@ public class UserInterface extends Application {
         setNicPer(0.0);
         setRowCount(5); //Row count begins at 5 because of Recipe Label, Recipe name, and flavor controls
         setProduct(new Text("Results"));
+        setComboBoxItems(FXCollections.observableArrayList());
 
         //Initialize first 3 left FlavorViews
-        for(int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 3; ++i) {
             getFlavors()[i] = new FlavorView();
         }
 
@@ -123,8 +139,10 @@ public class UserInterface extends Application {
     //endregion
 
     //region Control Set Methods
+
     /**
      * Method to create and instantiate the menubar at the top-left corner of the stage.
+     *
      * @param stage The initial GUI window the opens on execution.
      * @return The completed menu control.
      */
@@ -137,9 +155,13 @@ public class UserInterface extends Application {
         MenuItem quit;
         MenuItem newWindow;
         MenuItem setWtTool;
+        MenuItem inventory;
+        MenuItem shoppingList;
         MenuItem saveSettings;
         MenuItem aboutProduct;
         EventHandler<ActionEvent> setValAction;
+        EventHandler<ActionEvent> setInventory;
+        EventHandler<ActionEvent> setShoppingList;
         EventHandler<ActionEvent> setQuitAction;
         EventHandler<ActionEvent> setAboutLlAction;
 
@@ -153,13 +175,17 @@ public class UserInterface extends Application {
         saveSettings = new MenuItem("Save");
         aboutProduct = new MenuItem("About LiquidLab");
         setWtTool = new MenuItem("Set Weight/Nic Values");
+        inventory = new MenuItem("Inventory");
+        shoppingList = new MenuItem("Shopping List");
         setValAction = selectSetValue();
+        setInventory = selectSetInventory();
+        setShoppingList = selectSetShoppingList();
         setQuitAction = selectQuit();
         setAboutLlAction = selectAboutLl();
 
         //Add all menu items to menu
         menuFile.getItems().addAll(newWindow, saveSettings, quit);
-        menuTools.getItems().addAll(setWtTool);
+        menuTools.getItems().addAll(setWtTool, inventory, shoppingList);
         menuAbout.getItems().addAll(aboutProduct);
         menu.getMenus().addAll(menuFile, menuTools, menuAbout);
 
@@ -168,6 +194,8 @@ public class UserInterface extends Application {
         saveSettings.setOnAction((event) -> saveButtonAction());
         quit.setOnAction(setQuitAction);
         setWtTool.setOnAction(setValAction);
+        inventory.setOnAction(setInventory);
+        shoppingList.setOnAction(setShoppingList);
         aboutProduct.setOnAction(setAboutLlAction);
 
         return menu;
@@ -175,7 +203,8 @@ public class UserInterface extends Application {
 
     /**
      * Formats and populates the top pane of the BorderPane
-     * @param stage The GUI window
+     *
+     * @param stage  The GUI window
      * @param parent The base BorderPane
      */
     private static void setTopPane(Stage stage, BorderPane parent) {
@@ -202,7 +231,8 @@ public class UserInterface extends Application {
 
     /**
      * Formats and populates the left pane of the BorderPane
-     * @param parent    The base BorderPane
+     *
+     * @param parent The base BorderPane
      */
     private static void setLeftPane(BorderPane parent) {
         //Declare left pane members
@@ -215,7 +245,7 @@ public class UserInterface extends Application {
 
         //Initialize left pane members
         setInput(new GridPane());
-        lBox= new HBox(8.0);
+        lBox = new HBox(8.0);
         lAnchor = new AnchorPane();
         saveBtn = new Button("Save");
         calcBtn = new Button("Calculate");
@@ -289,7 +319,7 @@ public class UserInterface extends Application {
 
         //Insert controls into the left pane
         int i;
-        for(i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
+        for (i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
             getFlavors()[i].addToLeftGrid(getInput());
         }
         getInput().add(getComboBox(), 0, 0, 3, 1);
@@ -330,13 +360,15 @@ public class UserInterface extends Application {
         getRecipeName().setPromptText("Recipe Name");
         getComboBox().setPromptText("Select Flavor...");
 
+
         //Populate ComboBox from Database
         DatabaseInteraction.selectFlavor("*");
-        for(i = 0; i < DatabaseInteraction.getResults().size(); i += 3) {
-            getComboBox().getItems().add(DatabaseInteraction.getResults().get(i));
+        for (i = 0; i < DatabaseInteraction.getResults().size(); i += 3) {
+            getComboBoxItems().add(DatabaseInteraction.getResults().get(i));
         }
 
         //Add event listeners to certain controls
+        getComboBox().setOnMouseClicked((event) -> checkRecipeAvailability());
         getComboBox().setOnMouseEntered((event) -> dbFlavorHover());
         getComboBox().setCellFactory(param -> dbFlavorHover());
         getAddFlavBtn().setOnMouseClicked((event) -> addFlavButtonAction());
@@ -355,11 +387,13 @@ public class UserInterface extends Application {
 
     /**
      * Method to format and populate the left pane of the BorderPane
+     *
      * @param parent The base BorderPane
      */
     private static void setRightPane(BorderPane parent) {
         //Declare right pane members
         Insets margin;
+        Button made;
         AnchorPane rAnchor;
         ColumnConstraints col1;
         ColumnConstraints col2;
@@ -369,6 +403,7 @@ public class UserInterface extends Application {
         //Initialize right pane members
         rAnchor = new AnchorPane();
         setOutput(new GridPane());
+        made = new Button("Made");
         margin = new Insets(20.0, 30.0, 30.0, 0.0);
         col1 = new ColumnConstraints(120.0);
         col2 = new ColumnConstraints(30.0);
@@ -379,8 +414,10 @@ public class UserInterface extends Application {
         BorderPane.setMargin(rAnchor, margin);
         AnchorPane.setTopAnchor(getOutput(), 10.0);
         AnchorPane.setLeftAnchor(getOutput(), 10.0);
+        AnchorPane.setTopAnchor(made, 0.0);
+        AnchorPane.setRightAnchor(made, 0.0);
         getOutput().getColumnConstraints().addAll(col1, col2, col3, col4);
-        rAnchor.getChildren().add(getOutput());
+        rAnchor.getChildren().addAll(getOutput(), made);
         parent.setRight(rAnchor);
         setRightControls(getOutput());
 
@@ -389,19 +426,23 @@ public class UserInterface extends Application {
         rAnchor.setId("right-anchor");
 
         //If any flavor fields are populated, display their calculations in this pane
-        for(int i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
-            if(!getFlavors()[i].getFlavPerField().getText().isEmpty()) {
+        for (int i = 0; i < getFlavors().length && getFlavors()[i] != null; ++i) {
+            if (!getFlavors()[i].getFlavPerField().getText().isEmpty()) {
                 getFlavors()[i].setFlavPercent(Double.parseDouble(getFlavors()[i].getFlavPerField().getText()));
                 getFlavors()[i].addToRightGrid(getOutput());
             }
         }
         //Check to see if Nic/Weight data has been assigned by the user
         checkUserInputsTable();
+
+        //Button event handler
+        made.setOnMousePressed((event) -> madeBtnPressed());
     }
 
     /**
      * Method to set the smaller controls in the right pane - TextFields, Text, Labels
-     * @param thisPane  The GridPane to add controls on
+     *
+     * @param thisPane The GridPane to add controls on
      */
     private static void setRightControls(GridPane thisPane) {
         //Declare local controls
@@ -491,8 +532,10 @@ public class UserInterface extends Application {
     //endregion
 
     //region Functional Methods
+
     /**
      * Method to create a new window and discard the old one when user selects File > New menu item.
+     *
      * @param stage New GUI window with fresh controls.
      */
     private static void selectNewWindow(Stage stage) {
@@ -518,7 +561,7 @@ public class UserInterface extends Application {
     private static void checkUserInputsTable() {
         //Check if the values exist
         DatabaseInteraction.queryForValues();
-        if(DatabaseInteraction.getResults().isEmpty()) { //if they don't
+        if (DatabaseInteraction.getResults().isEmpty()) { //if they don't
             new ValueWindow();  //open new ValueWindow to request user input
         } else { //if they do
             BusinessLogic.getUserValues(); //retrieve them
@@ -528,13 +571,14 @@ public class UserInterface extends Application {
 
     /**
      * Method to restrict TextField input values
-     * @param field The TextField to restrict
-     * @param maxLen    The maximum number of inputs allowed
+     *
+     * @param field  The TextField to restrict
+     * @param maxLen The maximum number of inputs allowed
      */
     static void formatTextField(TextField field, int maxLen) {
         field.setTextFormatter(new TextFormatter<>((change) -> {
             String newText = change.getControlNewText();
-            return newText.length() > maxLen?null:change;
+            return newText.length() > maxLen ? null : change;
         }));
     }
 
@@ -582,10 +626,13 @@ public class UserInterface extends Application {
                         str = "A percentage has not been supplied for \n one or more flavors.";
                         break;
                     case 8:
-                        str = "Cannot insert into database unless all \nflavors contain a name.";
+                        str = "All flavors must contain a name in order to \n complete this action.";
                         break;
                     case 9:
                         str = "You must provide a recipe name to save \nto the database.";
+                        break;
+                    case 10:
+                        str = "You must select a flavor to remove.";
                         break;
                 }
 
@@ -603,13 +650,30 @@ public class UserInterface extends Application {
                 str = "The operation was successful.";
                 switch (num) {
                     case 0:
-                        str = "This recipe was successfully updated \nin the database.";
+                        str = "Database has been updated successfully.";
                         break;
                     case 1:
                         str = "This recipe was successfully added \nto the database.";
                         break;
                     case 2:
-                        str = "This recipe was successfully removed \nfrom the database";
+                        str = "This recipe was successfully removed \nfrom the database.";
+                        break;
+                    case 3:
+                        str = "This flavor was successfully removed \nfrom the inventory.";
+                        break;
+                    case 4:
+                        str = "Flavor usage has been subtracted from \nthe inventory.";
+                        if (!getRecipeName().getText().isEmpty()) {
+                            str = str + "\n\n Enjoy your " + getMlToMake().getText() + " ml of " + getRecipeName().getText() + "!";
+                        }
+                        break;
+                    case 5:
+                        str = "Flavors added to inventory at default 10ml" +
+                                "\n\nPlease use \"Tools > Inventory\" to modify.";
+                        break;
+                    case 6:
+                        str = "This flavor was successfully removed \nfrom the Shopping List.";
+                        break;
                 }
 
                 alert.setContentText(str);
@@ -627,18 +691,38 @@ public class UserInterface extends Application {
                 switch (num) {
                     case 0:
                         str = "Are you sure you want to remove this recipe?";
-                    default:
-                        alert.setContentText(str);
-                        alert.showAndWait().ifPresent((rs) -> {
-                            if (rs == ButtonType.OK) {
-                                DatabaseInteraction.deleteFlavor(getRecipeName().getText());
-                                getComboBox().getItems().remove(getRecipeName().getText());
-                                msgBox("INFO", 2);
-                                alert.close();
-                            }
 
-                        });
+                        break;
+                    case 1:
+                        str = "The following flavors are not contained \n" +
+                                " in your inventory. Would you like to add them? \n \n";
+                        for (String[] flav : getFlavsNotInInv()) {
+                            if (flav[0].isEmpty()) {
+                                str = str + flav[1] + "\n";
+                            } else {
+                                str = str + "[" + flav[0] + "] " + flav[1] + "\n";
+                            }
+                        }
                 }
+                alert.setContentText(str);
+                String finalStr = str;
+                alert.showAndWait().ifPresent((rs) -> {
+                    if (rs == ButtonType.OK) {
+                        if (finalStr.contains("remove this recipe")) {
+                            DatabaseInteraction.deleteFlavor(getRecipeName().getText());
+                            getComboBoxItems().remove(getRecipeName().getText());
+                            //getComboBox().getItems().remove(getRecipeName().getText());
+                            msgBox("INFO", 2);
+                        } else if (finalStr.contains("add them")) {
+                            for (String[] flav : getFlavsNotInInv()) {
+                                DatabaseInteraction.insertInventory(flav[0], flav[1], "10");
+                            }
+                            msgBox("INFO", 5);
+                        }
+                    }
+                    alert.close();
+
+                });
                 break;
         }
 
@@ -646,12 +730,13 @@ public class UserInterface extends Application {
     //endregion
 
     //region Event Handlers
+
     /**
      * Method to handle the user pressing the "Calculate" button
      */
     private static void calcButtonAction() {
         FlavorView.reset();
-        if(!getRecipeName().getText().isEmpty()) { //If a recipe name was supplied,
+        if (!getRecipeName().getText().isEmpty()) { //If a recipe name was supplied,
             setProduct(new Text(getRecipeName().getText())); //Update the right-pane label
         }
         BusinessLogic.calculate();
@@ -661,7 +746,14 @@ public class UserInterface extends Application {
      * Method to handle the user pressing the "Save" button
      */
     private static void saveButtonAction() {
+        checkInventory();
+        checkRecipeAvailability();
         BusinessLogic.save();
+        for (String str : getComboBoxItems()) {
+            if (str.equals(getRecipeName().getText())) {
+                getComboBox().getSelectionModel().select(str);
+            }
+        }
     }
 
     /**
@@ -677,7 +769,7 @@ public class UserInterface extends Application {
         getFlavors()[getRowCount() - 2].getFlavPerField().addEventFilter(KeyEvent.KEY_TYPED, UserInterface::flavPerKeyEntered);
 
         //Replace the button on the next row
-        if(getRowCount() < 11) {
+        if (getRowCount() < 11) {
             getInput().add(getAddFlavBtn(), 5, getRowCount() + 1);
             setRowCount(getRowCount() + 1);
         }
@@ -693,7 +785,8 @@ public class UserInterface extends Application {
 
     /**
      * Method to create ToolTip when hovering mouse over ComboBox item
-     * @return  The new cell with updated ToolTip
+     *
+     * @return The new cell with updated ToolTip
      */
     public static ListCell dbFlavorHover() {
         Tooltip tt;
@@ -702,30 +795,93 @@ public class UserInterface extends Application {
 
         return new ListCell<String>() {
             @Override
-            public void updateItem(String str, boolean empty) { //Return the updated ListCell item
+            public void updateItem(String item, boolean empty) { //Return the updated ListCell item
                 String notes = "";
-                super.updateItem(str, empty); //Update the ListCell
-                if (str != null) {
-                    setText(str);
+                super.updateItem(item, empty); //Update the ListCell
+                if (item != null) {
+                    setText(item);
                     //Grab Notes column from DB
-                    DatabaseInteraction.selectNotes(str);
+                    DatabaseInteraction.selectNotes(item);
                     if (!DatabaseInteraction.getResults().isEmpty()) {
                         notes = DatabaseInteraction.getResults().get(0);
                     }
                     //Create tooltip containing Notes info
                     if (!notes.isEmpty()) {
                         tt.setText(notes);
-                    }
-                    else {
-                        tt.setText(str);    //Populate tooltip with flavor name
+                    } else {
+                        tt.setText(item);    //Populate tooltip with flavor name
                     }
                     setTooltip(tt);
                 } else {
                     setText(null);
                     setTooltip(null);
                 }
+                getComboBox().setItems(new SortedList<>(getComboBoxItems(), Collator.getInstance()));
             }
         };
+    }
+
+    private static void checkRecipeAvailability() {
+        getComboBox().setCellFactory(list -> new ListCellClass());
+
+    }
+
+
+
+    static class ListCellClass extends ListCell<String> {
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            Tooltip tt;
+            String notes;
+
+
+            tt = new Tooltip();
+            notes = "";
+            setGraphic(null);
+            Circle rect = new Circle(3);
+            if (item != null) {
+                if (!getMlToMake().getText().isEmpty()) {
+                    String[] flavArr = BusinessLogic.setFlavArr(item);    //Set an array of flavors [%,Ven,Fl]
+                    for (int j = 0; j < flavArr.length; j = j + 3)   //For each element in this new array
+                    {
+                        setMlLeft(0.0);
+                        String percentNeeded = flavArr[j];
+                        String ven = flavArr[j + 1];
+                        String name = flavArr[j + 2];
+                        BusinessLogic.setFlavorMl((Double.parseDouble(getMlToMake().getText()) *        //Set Total ML for this flavor
+                                Double.parseDouble(percentNeeded)) / 100);
+                        DatabaseInteraction.queryInventory(ven, name);  //Query inventory for this fl
+                        if (DatabaseInteraction.getResults().size() > 1) {
+                            setMlLeft(Double.parseDouble(DatabaseInteraction.getResults().get(2)));
+                        }
+                        if (BusinessLogic.getFlavorMl() > getMlLeft()) {
+                            rect.setFill(Color.RED);
+                            setGraphic(rect);
+                            break;
+                        }
+                    }
+                }
+
+                    //Set tooltip
+                    DatabaseInteraction.selectNotes(item);
+                    if (!DatabaseInteraction.getResults().isEmpty()) {
+                        notes = DatabaseInteraction.getResults().get(0);
+                    }
+                    //Create tooltip containing Notes info
+                    if (!notes.isEmpty()) {
+                        tt.setText(notes);
+                    } else {
+                        tt.setText(item);    //Populate tooltip with flavor name
+                    }
+                    setTooltip(tt);
+                } else {
+                    setText(null);
+                    setTooltip(null);
+                    }
+                    BusinessLogic.setFlavorMl(0.0);
+                    setText(item);
+        }
     }
 
     /**
@@ -753,6 +909,66 @@ public class UserInterface extends Application {
      */
     private static EventHandler<ActionEvent> selectSetValue() {
         return (actionEvent) -> new ValueWindow();
+    }
+
+    private static void madeBtnPressed() {
+        checkInventory();
+        String ven = "";
+        String name;
+        String amt;
+        for (int i = 0; i < getFlavors().length; i++)
+        {
+            if (getFlavors()[i] != null) {
+                if(!getFlavors()[i].getVenField().getText().isEmpty()) {
+                    ven = getFlavors()[i].getVenField().getText();
+                }
+                name = getFlavors()[i].getFlavField().getText();
+                DatabaseInteraction.queryInventory(ven, name);
+                if(DatabaseInteraction.getResults().size() > 0) {
+                    amt = DatabaseInteraction.getResults().get(2);
+                    Double newAmt = Double.parseDouble(amt) - getFlavors()[i].getFlavMl();
+                    DatabaseInteraction.updateInventory(ven, name, BusinessLogic.round(newAmt).toString());
+                }
+            }
+        }
+        msgBox("INFO", 4);
+    }
+
+    private static void checkInventory()
+    {
+
+        setFlavsNotInInv(new ArrayList<>());
+        for (int i = 0; i < getFlavors().length; i++) {
+            if (getFlavors()[i] != null) {
+                String ven = getFlavors()[i].getVenField().getText();
+                String name = getFlavors()[i].getFlavField().getText();
+                DatabaseInteraction.queryInventory(ven, name);
+                if (DatabaseInteraction.getResults().isEmpty()) //found exact match
+                {
+                    if(!name.isEmpty()) {
+                        String[] flav = new String[] {ven, name};
+                        getFlavsNotInInv().add(flav);
+                    }
+                }
+            }
+        }
+        if (!getFlavsNotInInv().isEmpty()) //there are listed flavors that are not in the inventory
+        {
+            msgBox("CONFIRM", 1);
+        }
+    }
+
+
+    /**
+     * Method to create new InventoryWindow when user selects Inventory from the Tools menu.
+     * @return  The user's menu selection
+     */
+    private static EventHandler<ActionEvent> selectSetInventory() {
+        return (actionEvent) -> new InventoryWindow();
+    }
+
+    private static EventHandler<ActionEvent> selectSetShoppingList() {
+        return (actionEvent) -> new ShoppingList();
     }
 
     /**
@@ -1080,6 +1296,10 @@ public class UserInterface extends Application {
         ourNicPer = txt;
     }
 
+    private static Double getMlLeft() { return ourMlLeft; }
+
+    private static void setMlLeft(Double mlleft) { ourMlLeft = mlleft; }
+
     /**
      * Get the GridPane row value to insert controls into the left GridPane
      * @return  The left GridPane row available for control insertion
@@ -1209,6 +1429,10 @@ public class UserInterface extends Application {
         ourNotes = txtArea;
     }
 
+    private static ArrayList<String[]> getFlavsNotInInv() { return flavsNotInInv; }
+
+    private static void setFlavsNotInInv(ArrayList<String[]> flavs) { flavsNotInInv = flavs; }
+
     /**
      * Gets the left (input) GridPane
      * @return The left (input) GridPane
@@ -1293,6 +1517,9 @@ public class UserInterface extends Application {
         return ourFlList;
     }
 
+    public static ObservableList<String> getComboBoxItems() { return cboxItems; }
+
+    private static void setComboBoxItems(ObservableList<String> items) { cboxItems = items; }
     /**
      * Sets a ComboBox in the GridPane
      * @param newBox A ComboBox of type String

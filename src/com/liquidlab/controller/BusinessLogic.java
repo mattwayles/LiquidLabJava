@@ -81,11 +81,11 @@ public class BusinessLogic {
         ourMlToMake = ml;
     }
 
-    private static double getFlavorMl() {
+    public static double getFlavorMl() {
         return ourFlavorMl;
     }
 
-    private static void setFlavorMl(double ml) {
+    public static void setFlavorMl(double ml) {
         ourFlavorMl = ml;
     }
 
@@ -257,7 +257,7 @@ public class BusinessLogic {
         ourVgGrams = gr;
     }
 
-    public static void parseData(String fl) {
+    public static String[] setFlavArr(String fl) {
         DatabaseInteraction.selectFlavor(fl);
         UserInterface.getNotes().setText(DatabaseInteraction.getResults().get(2));
         String flavors = DatabaseInteraction.getResults().get(1);
@@ -265,24 +265,32 @@ public class BusinessLogic {
         String[] results = flavors.split("%");
 
         int j;
-        for(j = 0; j < results.length; ++j) {
+        for (j = 0; j < results.length; ++j) {
             String i = results[j].trim();
             results[j] = i;
         }
 
-        j = 0;
-        if(results.length > 1) {
-            for (int i = 0; i < results.length; i += 3) {
-                if(UserInterface.getFlavors()[j] == null)
-                {
-                    UserInterface.addFlavButtonAction();
+        return results;
+    }
+
+    public static void parseData(String fl) {
+        String[] results;
+        if (fl != null) {
+            results = setFlavArr(fl);
+
+            int j = 0;
+            if (results.length > 1) {
+                for (int i = 0; i < results.length; i += 3) {
+                    if (UserInterface.getFlavors()[j] == null) {
+                        UserInterface.addFlavButtonAction();
+                    }
+                    if (!results[i + 1].isEmpty()) {
+                        UserInterface.getFlavors()[j].getVenField().setText(results[i + 1]);
+                    }
+                    UserInterface.getFlavors()[j].getFlavField().setText(results[i + 2]);
+                    UserInterface.getFlavors()[j].getFlavPerField().setText(results[i]);
+                    ++j;
                 }
-                if (!results[i + 1].isEmpty()) {
-                    UserInterface.getFlavors()[j].getVenField().setText(results[i + 1]);
-                }
-                UserInterface.getFlavors()[j].getFlavField().setText(results[i + 2]);
-                UserInterface.getFlavors()[j].getFlavPerField().setText(results[i]);
-                ++j;
             }
         }
     }
@@ -291,10 +299,11 @@ public class BusinessLogic {
     {
         //Declare local variable
         boolean alreadyInDb;
-        String recipe = UserInterface.getRecipeName().getText();
+        String recipe;
 
         //Initialize local variable
         alreadyInDb = false;
+        recipe = UserInterface.getRecipeName().getText();
 
         //Quick error check - cannot add recipe to database without a name
         if(recipe.isEmpty())
@@ -317,7 +326,8 @@ public class BusinessLogic {
                 if (!alreadyInDb) {
                     DatabaseInteraction.insertFlavor(recipe, flavorData, UserInterface.getNotes().getText());
                     UserInterface.msgBox("INFO", 1);
-                    UserInterface.getComboBox().getItems().add(recipe);
+                    UserInterface.getComboBoxItems().add(recipe);
+                    //UserInterface.getComboBox().getItems().add(recipe);
                 }
             }
         }
@@ -400,7 +410,15 @@ public class BusinessLogic {
         setVgTotalPercent(getVgMl() / getMlToMake() * 100.0);
     }
 
+    public static Double round(Double num)
+    {
+        DecimalFormat df = new DecimalFormat("#.##");
+        return Double.parseDouble(df.format(num));
+    }
+
+
     public static void calculate() {
+        reset();
         DecimalFormat df = new DecimalFormat("#.##");
         if(!UserInterface.getMlToMake().getText().isEmpty() && !UserInterface.getPg().getText().isEmpty()) {
             if(UserInterface.getNic().getText().isEmpty()) {
@@ -428,6 +446,7 @@ public class BusinessLogic {
                             }
                         } else if(!flavor.isEmpty() && percent.isEmpty()) {
                             UserInterface.msgBox("ERROR", 7);
+                            break;
                         } else if(flavor.isEmpty() && !percent.isEmpty()) {
                             if(!ven.isEmpty()) {
                                 calcFlavorGrams(new Flavor(ven, "No-Name Flavor", Double.parseDouble(percent)), df, i);
@@ -457,7 +476,6 @@ public class BusinessLogic {
                     UserInterface.setPgPer(Double.parseDouble(df.format(getPgTotalPercent())));
                     UserInterface.setVgPer(Double.parseDouble(df.format(getVgTotalPercent())));
                     UserInterface.update();
-                    reset();
                 }
 
             }

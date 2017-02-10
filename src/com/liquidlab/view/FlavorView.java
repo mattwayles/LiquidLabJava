@@ -127,7 +127,7 @@ public class FlavorView extends Control {
         this.myFlav = fl;
     }
 
-    private Double getFlavMl() {
+    Double getFlavMl() {
         return this.myFlavMl;
     }
 
